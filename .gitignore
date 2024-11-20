@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+#ignorar
+.venv/
+cache/
+ignorar/
