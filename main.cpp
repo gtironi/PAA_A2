@@ -1,43 +1,114 @@
-#include <iostream>
 #include "graph.h"
-#include "dijkstra.h"
-#include "prim.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <string>
+#include <algorithm>
+
+// Função para determinar o maior índice de vértice no arquivo CSV
+int getMaxVertex(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo " << filename << std::endl;
+        return -1;
+    }
+
+    std::string line;
+    bool isHeader = true;
+    int maxVertex = 0;
+
+    while (std::getline(file, line)) {
+        if (isHeader) {
+            isHeader = false;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string vOrigemStr, vDestinoStr;
+        std::getline(ss, vOrigemStr, ',');
+        std::getline(ss, vDestinoStr, ',');
+
+        try {
+            int vOrigem = std::stoi(vOrigemStr);
+            int vDestino = std::stoi(vDestinoStr);
+            maxVertex = std::max({maxVertex, vOrigem, vDestino});
+        } catch (const std::exception& e) {
+            std::cerr << "Erro ao processar linha: " << line << "\n"
+                      << "Detalhes do erro: " << e.what() << std::endl;
+        }
+    }
+
+    file.close();
+    return maxVertex;
+}
+
+// Função para carregar o grafo a partir de um arquivo CSV
+void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir o arquivo " << filename << std::endl;
+        return;
+    }
+
+    std::string line;
+    bool isHeader = true;
+
+    while (std::getline(file, line)) {
+        if (isHeader) {
+            isHeader = false;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string vOrigemStr, vDestinoStr, bairro, onewayStr, lengthStr, maxSpeedStr;
+
+        std::getline(ss, vOrigemStr, ',');
+        std::getline(ss, vDestinoStr, ',');
+        std::getline(ss, bairro, ',');
+        std::getline(ss, onewayStr, ',');
+        std::getline(ss, lengthStr, ',');
+        std::getline(ss, maxSpeedStr, ',');
+
+        try {
+            vertex vOrigem = std::stoi(vOrigemStr);
+            vertex vDestino = std::stoi(vDestinoStr);
+            bool oneway = (onewayStr == "True");
+            int length = static_cast<int>(std::stof(lengthStr));
+            int maxSpeed = static_cast<int>(std::stof(maxSpeedStr));
+
+            // Valida se os vértices estão dentro dos limites do grafo
+            if (vOrigem >= graph.numVertices() || vDestino >= graph.numVertices()) {
+                std::cerr << "Vértices fora do limite: " << vOrigem << ", " << vDestino << std::endl;
+                continue;
+            }
+
+            // Adiciona a aresta ao grafo
+            graph.addEdge(vOrigem, vDestino, bairro, length, maxSpeed, oneway);
+        } catch (const std::exception& e) {
+            std::cerr << "Erro ao processar linha: " << line << "\n"
+                      << "Detalhes do erro: " << e.what() << std::endl;
+        }
+    }
+
+    file.close();
+}
 
 int main() {
-    // Exemplo de grafo com 6 vértices
-    GraphAdjList graph(6);
+    const std::string filename = "data.csv";
 
-    // Adiciona arestas (exemplo)
-    graph.addEdge(0, 1, "Centro", 4);
-    graph.addEdge(0, 2, "Centro", 2);
-    graph.addEdge(1, 3, "Centro", 5);
-    graph.addEdge(2, 3, "Centro", 8);
-    graph.addEdge(3, 4, "Centro", 6);
-    graph.addEdge(4, 5, "Centro", 3);
-    
+    // Determina o maior índice de vértice no arquivo CSV
+    int maxVertex = getMaxVertex(filename);
+    if (maxVertex == -1) {
+        return 1; // Erro ao abrir o arquivo
+    }
+
+    GraphAdjList graph(maxVertex + 1); // Cria o grafo com base no maior índice de vértice
+
+    // Carrega o grafo a partir do arquivo CSV
+    loadGraphFromCSV(filename, graph);
+
+    // Exibe o grafo
     graph.print();
-
-    // Executando Dijkstra
-    int parentDijkstra[6];
-    int distanceDijkstra[6];
-    Dijkstra::compute(graph, 0, parentDijkstra, distanceDijkstra);
-
-    std::cout << "Dijkstra:\n";
-    for (int i = 0; i < 6; i++) {
-        std::cout << "Vertex: " << i << ", Parent: " << parentDijkstra[i]
-                  << ", Distance: " << distanceDijkstra[i] << "\n";
-    }
-    
-    
-
-    // Executando Prim
-    int parentPrim[6];
-    Prim::mst(graph, parentPrim);
-
-    std::cout << "\nPrim MST:\n";
-    for (int i = 0; i < 6; i++) {
-        std::cout << "Vertex: " << i << ", Parent: " << parentPrim[i] << "\n";
-    }
 
     return 0;
 }
