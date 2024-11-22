@@ -1,8 +1,8 @@
 #include "graph.h"
 
 // Implementação da classe EdgeNode
-EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int cost, EdgeNode* next)
-    : m_otherVertex(otherVertex), m_bairro(bairro), m_cost(cost), m_next(next) {}
+EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int cost, int maxSpeed, EdgeNode* next)
+    : m_otherVertex(otherVertex), m_bairro(bairro), m_cost(cost), m_maxSpeed(maxSpeed), m_next(next) {}
 
 vertex EdgeNode::otherVertex() {
     return m_otherVertex;
@@ -14,6 +14,10 @@ string EdgeNode::bairro() {
 
 int EdgeNode::cost() {
     return m_cost;
+}
+
+int EdgeNode::maxSpeed() {
+    return m_maxSpeed;
 }
 
 EdgeNode* EdgeNode::next() {
@@ -45,7 +49,8 @@ GraphAdjList::~GraphAdjList() {
     delete[] m_edges;
 }
 
-void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost) {
+void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost, int maxSpeed, bool oneway) {
+    // Adiciona a aresta de v1 para v2
     EdgeNode* edge = m_edges[v1];
     while (edge) {
         if (edge->otherVertex() == v2) {
@@ -54,8 +59,21 @@ void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost)
         }
         edge = edge->next();
     }
-    m_edges[v1] = new EdgeNode(v2, bairro, cost, m_edges[v1]);
+    m_edges[v1] = new EdgeNode(v2, bairro, cost, maxSpeed, m_edges[v1]);
     m_numEdges++;
+
+    // Se não for oneway, adiciona a aresta de v2 para v1
+    if (!oneway) {
+        edge = m_edges[v2];
+        while (edge) {
+            if (edge->otherVertex() == v1) {
+                return; // Já existe
+            }
+            edge = edge->next();
+        }
+        m_edges[v2] = new EdgeNode(v1, bairro, cost, maxSpeed, m_edges[v2]);
+        m_numEdges++;
+    }
 }
 
 void GraphAdjList::removeEdge(vertex v1, vertex v2) {
@@ -85,7 +103,8 @@ void GraphAdjList::print() {
             cout << "-> ("
                  << "Destino: " << edge->otherVertex()
                  << ", Bairro: " << edge->bairro()
-                 << ", Peso: " << edge->cost() << ") ";
+                 << ", Peso: " << edge->cost()
+                 << ", Velocidade Máxima: " << edge->maxSpeed() << ") ";
             edge = edge->next();
         }
         cout << "\n";
