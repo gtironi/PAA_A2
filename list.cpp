@@ -1,5 +1,5 @@
 #include <iostream>
-#include <list.h>
+#include "list.h"
 using namespace std;
 
 // Estrutura para a lista de inteiros
@@ -26,6 +26,17 @@ struct IntList {
     IntNode* head = nullptr;
 
     IntList::IntList() : head(nullptr) {}
+
+    void insert_front(int value) {
+        // Cria um novo nó com o valor fornecido
+        IntNode* newNode = new IntNode(value);
+        
+        // Faz o novo nó apontar para o nó atual da cabeça
+        newNode->next = head;
+        
+        // Atualiza a cabeça da lista para o novo nó
+        head = newNode;
+    }
 
     void append(int value) {
         IntNode* newNode = new IntNode(value);

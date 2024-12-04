@@ -173,7 +173,7 @@ void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
     EdgeNode* prev = nullptr;
     EdgeNode* edge = m_edges[vi];
     int cost = -1;
-    int bairro = -1;
+    std::string bairro;
     int maxSpeed = -1;
 
     while (edge != nullptr) {
@@ -286,7 +286,7 @@ GraphAdjList* GraphAdjList::createBidirectionalCopy() const {
 
             // Adiciona as arestas (i, j) e (j, i) no grafo bidirecional
             bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false);
-            bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
+            // bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
 
             edge = edge->next();
         }

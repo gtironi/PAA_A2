@@ -1,32 +1,37 @@
 #include "graph.h"
 #include "dijkstra.h"
+#include "list.h"
 #include <iostream>
 using namespace std;
 
+int enderecoToDist(int);
 
-void melhorRota(GraphAdjList& graph, int enderecoOrigem, int enderecoDestino, int custoMax) {
-    // int** rota[2][];
-    int** rota = new int*[2];
-
-    // Para cada linha, alocar memória para as colunas
-    for (int i = 0; i < 2; ++i) {
-        rota[i] = new int[3];
-    }
-
+void melhorRota(GraphAdjList& graph, int origem, int destino, int custoMax) {
+    NodeList rota;
 
     GraphAdjList* graphCompleto = graph.createBidirectionalCopy();
     GraphAdjList* graphDirecionado = graph.clone();
 
+    // int distOrigem = enderecoToDist(enderecoOrigem);
+    // int distDestino = enderecoToDist(enderecoDestino);
+    
+    // graphCompleto->splitEdge(enderecoOrigem.vi, enderecoOrigem.vj, distOrigem);
+    // graphCompleto->splitEdge(enderecoDestino.vi, enderecoDestino.vj, distDestino);
+    // graphDirecionado->splitEdge(enderecoOrigem.vi, enderecoOrigem.vj, distOrigem);
+    // graphDirecionado->splitEdge(enderecoDestino.vi, enderecoDestino.vj, distDestino);
+
+    // int origem = (graphCompleto->numVertices())-2;
+    // int destino = (graphCompleto->numVertices())-1;
 
     float tempoTaxi = rotaTaxi(*graphCompleto, *graphDirecionado, rota, origem, destino, custoMax);
     // float tempoMetro = rotaMetro(graph, rota, custoMax);
     // float tempoOnibus = rotaOnibus(graph, rota, custoMax);
     // float tempoMetroOnibus = rotaMetroOnibus(graph, rota, custoMax);
-    cout << 
+    cout << "foi" << endl;
     return;
 }
 
-float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, int** rota, int origem, int destino, int custoMax){
+float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax){
     // custo/taxa = distância maxima que consigo andar de taxi
     // dijkstra até eu chegar no vértice do destino
     // pego o parent e vejo até onde deu para chegar de taxi
@@ -43,26 +48,28 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, int*
     int parentTaxi[graphDirecionado.numVertices()];
     
     // Dijkstra para achar o menor caminho de taxi até o endereço
-    dijkstra(graphDirecionado, origem, parentTaxi, distanceTaxi);
+    Dijkstra dijkstra;
+    dijkstra.compute(graphDirecionado, origem, parentTaxi, distanceTaxi);
 
 
     int dist = 0;
     int vertice = destino;
     int filho;
+    IntList caminhoTaxi;
     // Loop para achar o vértice mais longe que da pra ir de taxi
     while (vertice != parentTaxi[vertice]){
+        caminhoTaxi.insert_front(vertice);
         dist = distanceTaxi[vertice];
         if (dist < distMax){ break;}
         filho = vertice;
         vertice = parentTaxi[vertice];
     }
+    caminhoTaxi.insert_front(vertice);
 
     // Se conseguir chegar no destino só de taxi retona
     if (vertice == destino){
         float tempo = calculaTempoTaxi(graphDirecionado, origem, destino, 0, 0, parentTaxi);
-        rota[0][0] = origem;
-        rota[0][1] = destino;
-        rota[0][2] = 1; // número refente ao taxi 
+        rota.append(1, tempo, &caminhoTaxi);
         return tempo;
     }
     int distRestante = distMax - dist;
@@ -70,23 +77,23 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, int*
     graphCompleto.splitEdge(vertice, filho, distRestante);
 
     float tempoTaxi  = calculaTempoTaxi(graphDirecionado, origem, vertice, filho, distRestante, parentTaxi);
-    rota[0][0] = origem;
-    rota[0][1] = graphCompleto.numVertices(); 
-    rota[0][2] = 1; // número refente ao taxi 
+    rota.append(1, tempoTaxi, &caminhoTaxi);
 
     int parentCaminhada[graphCompleto.numVertices()];
     int distanceCaminhada[graphCompleto.numVertices()];
-    dijkstra(graphCompleto, graphCompleto.numVertices(), parentCaminhada, distanceCaminhada);
+    dijkstra.compute(graphCompleto, graphCompleto.numVertices()-1, parentCaminhada, distanceCaminhada);
 
     vertice = destino;
-    while vertice != parentCaminhada[vertice]{
+    IntList caminhoCaminhada;
+    // Loop para achar o vértice mais longe que da pra ir de taxi
+    while (vertice != parentCaminhada[vertice]){
+        caminhoCaminhada.insert_front(vertice);
         vertice = parentCaminhada[vertice];
     }
+    caminhoCaminhada.insert_front(vertice);
 
-    float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, graphCompleto.numVertices(), destino, parentCaminhada);
-    rota[1][0] = graphCompleto.numVertices();
-    rota[1][1] = destino; 
-    rota[1][2] = 1; // número refente ao taxi 
+    float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, graphCompleto.numVertices()-1, destino, parentCaminhada);
+    rota.append(0, tempoCaminhada, &caminhoCaminhada);
 
     return tempoTaxi + tempoCaminhada;
 }
