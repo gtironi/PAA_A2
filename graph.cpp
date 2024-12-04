@@ -237,13 +237,13 @@ void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
     // addEdge(vk, vj, bairro, cost - distRestante, maxSpeed, false);
 }
 
-GraphAdjList::GraphAdjList(const GraphAdjList& other) {
-    m_numVertices = other.m_numVertices;
-    m_numEdges = other.m_numEdges;
-    m_edges = new EdgeNode*[m_numVertices];
+GraphAdjList* GraphAdjList::clone() const {
+    // Cria um novo grafo com o mesmo número de vértices
+    GraphAdjList* newGraph = new GraphAdjList(m_numVertices);
 
+    // Copia todas as arestas
     for (int i = 0; i < m_numVertices; ++i) {
-        EdgeNode* current = other.m_edges[i];
+        EdgeNode* current = m_edges[i];
         EdgeNode* previous = nullptr;
 
         while (current) {
@@ -251,7 +251,7 @@ GraphAdjList::GraphAdjList(const GraphAdjList& other) {
                                              current->cost(), current->maxSpeed(), nullptr);
 
             if (!previous) {
-                m_edges[i] = newEdge; // Primeira aresta da lista
+                newGraph->m_edges[i] = newEdge; // Primeira aresta na lista
             } else {
                 previous->setNext(newEdge); // Conecta à última aresta copiada
             }
@@ -261,18 +261,21 @@ GraphAdjList::GraphAdjList(const GraphAdjList& other) {
         }
 
         if (!previous) {
-            m_edges[i] = nullptr; // Nenhuma aresta para este vértice
+            newGraph->m_edges[i] = nullptr; // Nenhuma aresta para este vértice
         }
     }
+
+    newGraph->m_numEdges = m_numEdges; // Copia o número de arestas
+    return newGraph;
 }
 
-GraphAdjList* createBidirectionalCopy(const GraphAdjList& original) {
-    // Cria uma nova instância do grafo com o mesmo número de vértices
-    GraphAdjList* bidirectionalGraph = new GraphAdjList(original.numVertices());
+GraphAdjList* GraphAdjList::createBidirectionalCopy() const {
+    // Cria um novo grafo com o mesmo número de vértices
+    GraphAdjList* bidirectionalGraph = new GraphAdjList(m_numVertices);
 
     // Percorre cada vértice do grafo original
-    for (int i = 0; i < original.numVertices(); ++i) {
-        EdgeNode* edge = original.getEdges(i);
+    for (int i = 0; i < m_numVertices; ++i) {
+        EdgeNode* edge = m_edges[i];
 
         // Percorre todas as arestas do vértice atual
         while (edge != nullptr) {
@@ -283,7 +286,7 @@ GraphAdjList* createBidirectionalCopy(const GraphAdjList& original) {
 
             // Adiciona as arestas (i, j) e (j, i) no grafo bidirecional
             bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false);
-            // bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
+            bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
 
             edge = edge->next();
         }
