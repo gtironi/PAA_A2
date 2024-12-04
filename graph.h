@@ -36,6 +36,9 @@ public:
     void addEdge(vertex v1, vertex v2, const string& bairro, int cost, int maxSpeed, bool oneway);
     void removeEdge(vertex v1, vertex v2);
     void print();
+    void splitEdge(int vi, int vj, int distRestante);
+    GraphAdjList* createBidirectionalCopy() const;
+    GraphAdjList* clone() const;
 
     int numVertices() const {
         return m_numVertices;
