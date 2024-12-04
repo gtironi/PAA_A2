@@ -8,13 +8,15 @@ void testDijkstra() {
     // Criar grafo de teste
     GraphAdjList graph(6);
 
+    int lotesType[4] = {1, 0, 0, 0};
+
     // Adiciona arestas
-    graph.addEdge(0, 1, "Centro", 4, 1, true);
-    graph.addEdge(0, 2, "Centro", 2, 1, true);
-    graph.addEdge(1, 3, "Centro", 5, 1, true);
-    graph.addEdge(2, 3, "Centro", 8, 1, true);
-    graph.addEdge(3, 4, "Centro", 6, 1, true);
-    graph.addEdge(4, 5, "Centro", 3, 1, true);
+    graph.addEdge(0, 1, "Centro", 4, 1, true, 1, lotesType);
+    graph.addEdge(0, 2, "Centro", 2, 1, true, 1, lotesType);
+    graph.addEdge(1, 3, "Centro", 5, 1, true, 1, lotesType);
+    graph.addEdge(2, 3, "Centro", 8, 1, true, 1, lotesType);
+    graph.addEdge(3, 4, "Centro", 6, 1, true, 1, lotesType);
+    graph.addEdge(4, 5, "Centro", 3, 1, true, 1, lotesType);
 
     // Resultados esperados
     int expectedParent[6] = {0, 0, 0, 1, 3, 4};
@@ -38,13 +40,15 @@ void testPrim() {
     // Criar grafo de teste
     GraphAdjList graph(6);
 
+    int lotesType[4] = {1, 0, 0, 0};
+
     // Adiciona arestas
-    graph.addEdge(0, 1, "Centro", 4, 1, true);
-    graph.addEdge(0, 2, "Centro", 2, 1, true);
-    graph.addEdge(1, 3, "Centro", 5, 1, true);
-    graph.addEdge(2, 3, "Centro", 8, 1, true);
-    graph.addEdge(3, 4, "Centro", 6, 1, true);
-    graph.addEdge(4, 5, "Centro", 3, 1, true);
+    graph.addEdge(0, 1, "Centro", 4, 1, true, 1, lotesType);
+    graph.addEdge(0, 2, "Centro", 2, 1, true, 1, lotesType);
+    graph.addEdge(1, 3, "Centro", 5, 1, true, 1, lotesType);
+    graph.addEdge(2, 3, "Centro", 8, 1, true, 1, lotesType);
+    graph.addEdge(3, 4, "Centro", 6, 1, true, 1, lotesType);
+    graph.addEdge(4, 5, "Centro", 3, 1, true, 1, lotesType);
 
     // Resultados esperados (Prim MST sempre forma uma árvore de custo mínimo)
     int expectedParent[6] = {0, 0, 0, 1, 3, 4};
