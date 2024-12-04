@@ -27,6 +27,7 @@ struct IntList {
     IntNode* head;   // Ponteiro para o início da lista
 
     IntList();             // Construtor
+    void insert_front(int value);
     void append(int value); // Adiciona um valor à lista
     void print();           // Imprime os elementos da lista
     void clear();           // Limpa a memória da lista
