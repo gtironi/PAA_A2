@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 #include "graph.h"
+#include "metro.h"
 
 int main() {
     // Grafo de táxi pra teste
@@ -37,18 +39,26 @@ int main() {
     graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
     graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
     graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
     graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
     graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
     graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
 
     GraphAdjList* graphMetroBidirectional = graphMetro.createBidirectionalCopy();
 
-    cout << "Printando grafo de metro: " << endl;
-    graphMetroBidirectional->print();   
+    //======================================================================
+    // Testando funções de metrô
+
+    // Criação do caminho no formato de lista
+    IntList* pathMetro = createPathMetro(*graphMetroBidirectional, 3, 10);
+
+    cout << "Caminho do metro: " << endl;
+    pathMetro->print();
+    cout << endl;
+
+    // Tempo gasto pela rota de metro
+    float timeTakenMetro = timeMetro(*graphMetroBidirectional, *pathMetro, 70);
+
+    cout << "Tempo do caminho do metro: " << timeTakenMetro << endl;
 
     return 0;
 }
