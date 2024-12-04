@@ -110,3 +110,133 @@ void GraphAdjList::print() {
         cout << "\n";
     }
 }
+
+void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
+    // Verifica se vi e vj são válidos
+    if (vi >= m_numVertices || vj >= m_numVertices || vi < 0 || vj < 0) {
+        cerr << "Erro: Vértices fora do limite.\n";
+        return;
+    }
+
+    // Localiza a aresta (vi, vj)
+    EdgeNode* prev = nullptr;
+    EdgeNode* edge = m_edges[vi];
+    int cost = -1;
+    int bairro = -1;
+    int maxSpeed = -1;
+
+    while (edge != nullptr) {
+        if (edge->otherVertex() == vj) {
+            cost = edge->cost();
+            bairro = edge->bairro();
+            maxSpeed = edge->maxSpeed();
+            break;
+        }
+        prev = edge;
+        edge = edge->next();
+    }
+
+    // Se não encontrou a aresta (vi, vj), retorna
+    if (cost == -1) {
+        cerr << "Erro: Aresta (" << vi << ", " << vj << ") não encontrada.\n";
+        return;
+    }
+
+    // Remove a aresta (vi, vj)
+    if (prev == nullptr) {
+        m_edges[vi] = edge->next();
+    } else {
+        prev->setNext(edge->next());
+    }
+    delete edge;
+
+    // Localiza e remove a aresta (vj, vi) de maneira similar
+    prev = nullptr;
+    edge = m_edges[vj];
+    while (edge != nullptr) {
+        if (edge->otherVertex() == vi) {
+            break;
+        }
+        prev = edge;
+        edge = edge->next();
+    }
+    if (edge != nullptr) {
+        if (prev == nullptr) {
+            m_edges[vj] = edge->next();
+        } else {
+            prev->setNext(edge->next());
+        }
+        delete edge;
+    }
+
+    // Cria um novo vértice vk
+    int vk = m_numVertices++;
+    EdgeNode** newEdges = new EdgeNode*[m_numVertices];
+    for (int i = 0; i < m_numVertices - 1; ++i) {
+        newEdges[i] = m_edges[i];
+    }
+    newEdges[m_numVertices - 1] = nullptr;
+    delete[] m_edges;
+    m_edges = newEdges;
+
+    // Adiciona as novas arestas (vi, vk), (vk, vi), (vj, vk) e (vk, vj)
+    addEdge(vi, vk, bairro, distRestante, maxSpeed, false);
+    // addEdge(vk, vi, bairro, distRestante, maxSpeed, false);
+    addEdge(vj, vk, bairro, cost - distRestante, maxSpeed, false);
+    // addEdge(vk, vj, bairro, cost - distRestante, maxSpeed, false);
+}
+
+GraphAdjList::GraphAdjList(const GraphAdjList& other) {
+    m_numVertices = other.m_numVertices;
+    m_numEdges = other.m_numEdges;
+    m_edges = new EdgeNode*[m_numVertices];
+
+    for (int i = 0; i < m_numVertices; ++i) {
+        EdgeNode* current = other.m_edges[i];
+        EdgeNode* previous = nullptr;
+
+        while (current) {
+            EdgeNode* newEdge = new EdgeNode(current->otherVertex(), current->bairro(),
+                                             current->cost(), current->maxSpeed(), nullptr);
+
+            if (!previous) {
+                m_edges[i] = newEdge; // Primeira aresta da lista
+            } else {
+                previous->setNext(newEdge); // Conecta à última aresta copiada
+            }
+
+            previous = newEdge;
+            current = current->next();
+        }
+
+        if (!previous) {
+            m_edges[i] = nullptr; // Nenhuma aresta para este vértice
+        }
+    }
+}
+
+GraphAdjList* createBidirectionalCopy(const GraphAdjList& original) {
+    // Cria uma nova instância do grafo com o mesmo número de vértices
+    GraphAdjList* bidirectionalGraph = new GraphAdjList(original.numVertices());
+
+    // Percorre cada vértice do grafo original
+    for (int i = 0; i < original.numVertices(); ++i) {
+        EdgeNode* edge = original.getEdges(i);
+
+        // Percorre todas as arestas do vértice atual
+        while (edge != nullptr) {
+            vertex j = edge->otherVertex();
+            string bairro = edge->bairro();
+            int cost = edge->cost();
+            int maxSpeed = edge->maxSpeed();
+
+            // Adiciona as arestas (i, j) e (j, i) no grafo bidirecional
+            bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false);
+            // bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
+
+            edge = edge->next();
+        }
+    }
+
+    return bidirectionalGraph;
+}
