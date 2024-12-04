@@ -19,6 +19,7 @@ public:
     int maxSpeed();
     bool isOneway();
     int numLotes();
+    float coefficient_lotes();
     void getLotesType(int lotesType[4]);
     EdgeNode* next();
     void setNext(EdgeNode* next);
@@ -31,6 +32,7 @@ private:
     bool m_oneway;          // Direção da aresta (se for unidirecional)
     int m_numLotes;         // Número de lotes
     int m_lotesType[4];     // Tipos de lotes (casas, indústrias, atrações, comércios)
+    float m_coefficient_lotes;  // Coeficiente de atratividade
     EdgeNode* m_next;       // Próxima aresta na lista
 };
 
@@ -43,10 +45,17 @@ public:
     void addEdge(vertex v1, vertex v2, const string& bairro, int length, int maxSpeed, bool oneway, int numLotes, int lotesType[4]);
     void removeEdge(vertex v1, vertex v2);
     void print();
-    int numBairros() const;
+
+    int numBairros() const {
+        return m_numBairros;
+    }
 
     int numVertices() const {
         return m_numVertices;
+    }
+
+    int numEdges() const {
+        return m_numEdges;
     }
 
     EdgeNode* getEdges(vertex v) const {

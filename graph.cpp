@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <climits>
 
 // Implementação da classe EdgeNode
 EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int maxSpeed, bool oneway, int numLotes, int lotesType[4], EdgeNode* next)
@@ -6,6 +7,19 @@ EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int max
     // Copiar o tipo de lotes
     for (int i = 0; i < 4; ++i) {
         m_lotesType[i] = lotesType[i];
+    }
+
+    // Calcular o coeficiente de atratividade
+    int numCasas = m_lotesType[0];      // Casas
+    int numIndustria = m_lotesType[1];  // Indústrias
+    int numAtracoes = m_lotesType[2];   // Atrações
+    int numComercios = m_lotesType[3];  // Comércios
+
+    // Evitar divisão por zero
+    if (numAtracoes + numComercios > 0) {
+        m_coefficient_lotes = (numCasas + numIndustria) / float(numAtracoes + numComercios);
+    } else {
+        m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é zero
     }
 }
 
@@ -31,6 +45,10 @@ bool EdgeNode::isOneway() {
 
 int EdgeNode::numLotes() {
     return m_numLotes;
+}
+
+float EdgeNode::coefficient_lotes() {
+    return m_coefficient_lotes;
 }
 
 void EdgeNode::getLotesType(int lotesType[4]) {
@@ -129,8 +147,7 @@ void GraphAdjList::print() {
                  << ", Bairro: " << edge->bairro()
                  << ", Comprimento: " << edge->length()
                  << ", Velocidade Máxima: " << edge->maxSpeed()
-                 << ", Oneway: " << (edge->isOneway() ? "Sim" : "Não")
-                 << ", Lotes: " << edge->numLotes() << ") ";
+                 << ", Coeficiente: " << edge->coefficient_lotes() << ") ";
             edge = edge->next();
         }
         cout << "\n";

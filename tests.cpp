@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <climits>
 #include "graph.h"
 #include "dijkstra.h"
 #include "prim.h"
@@ -65,8 +66,36 @@ void testPrim() {
     std::cout << "Teste Prim passou!\n";
 }
 
+void testCoeficiente() {
+    // Criar grafo de teste
+    GraphAdjList graph(6);
+
+    int lotesType1[4] = {3, 20, 14, 9};  //1
+    int lotesType0[4] = {1, 10, 0, 0};  //INT_MAX
+    int lotesType2[4] = {20, 0, 2, 2};  //5
+
+    // Adiciona arestas com diferentes lotesType para testar a fórmula
+    graph.addEdge(0, 1, "Centro", 4, 1, true, 1, lotesType0);
+    graph.addEdge(0, 2, "Centro", 2, 1, true, 1, lotesType1);
+    graph.addEdge(0, 3, "Centro", 2, 1, true, 1, lotesType2);
+
+    // Verificar se o coeficiente foi calculado corretamente para cada aresta
+    EdgeNode* edge = graph.getEdges(0);
+
+    assert(edge->coefficient_lotes() == 5);
+
+    edge = edge->next();
+    assert(edge->coefficient_lotes() == 1);
+
+    edge = edge->next();
+    assert(edge->coefficient_lotes() == INT_MAX);
+
+    std::cout << "Teste de coeficiente passou!\n";
+}
+
 int main() {
     testDijkstra();
     testPrim();
+    testCoeficiente();
     return 0;
 }
