@@ -16,14 +16,11 @@ IntList* pathVertices(int start, int end, int* parent) {
     // E vamos voltando
     while (currentVertex != start)
     {
-        cout << "vertice atual:  " << currentVertex << endl;
         path->insert_front(currentVertex);
         currentVertex = parent[currentVertex];
     }
 
     // Primeira posição do caminho é a origem
-    cout << "último vértice: ";
-    cout << "vertice atual:  " << currentVertex << endl;
     path->insert_front(currentVertex);
 
     return path;
@@ -88,5 +85,5 @@ float timeMetro(GraphAdjList& graphMetro, IntList& path, const int SPEED_METRO){
         currentVertex = currentVertex->next;
     }
     
-    return tempoTotal/SPEED_METRO;
+    return tempoTotal/float(SPEED_METRO);
 }
