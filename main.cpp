@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
+#include <set>
 
 // Function to determine the maximum vertex index in the CSV file
 int getMaxVertex(const std::string& filename) {
@@ -116,9 +117,10 @@ int main() {
     std::unordered_map<std::string, vertex> busStops;
     BusStopSelection::selectBusStops(graph, busStops);
 
-    // Connect bus stops with MST
+    // Connect bus stops with MST, including paths in original graph
     std::vector<std::pair<vertex, vertex>> mstEdges;
-    MSTConstruction::constructMST(graph, busStops, mstEdges);
+    std::set<std::pair<vertex, vertex>> finalEdges; // To store all edges in the final network
+    MSTConstruction::constructMST(graph, busStops, mstEdges, finalEdges);
 
     // Display the results
     std::cout << "Selected Bus Stops:\n";
@@ -126,9 +128,14 @@ int main() {
         std::cout << "Neighborhood: " << pair.first << ", Vertex: " << pair.second << "\n";
     }
 
-    std::cout << "\nMST Edges:\n";
+    std::cout << "\nMST Edges between Bus Stops:\n";
     for (const auto& edge : mstEdges) {
         std::cout << "From " << edge.first << " to " << edge.second << "\n";
+    }
+
+    std::cout << "\nFinal Network Edges:\n";
+    for (const auto& edge : finalEdges) {
+        std::cout << "Edge from " << edge.first << " to " << edge.second << "\n";
     }
 
     return 0;
