@@ -1,4 +1,5 @@
 #include "heap.h"
+#include <algorithm>
 
 void MinHeap::heapify_up(int idx) {
     while (idx > 0) {
@@ -48,18 +49,18 @@ void MinHeap::insert_or_update(int priority, int vertex) {
 
 int MinHeap::extract_min() {
     if (heap.empty()) {
-        return -1;  // Retorna um valor inválido se a heap estiver vazia
+        return -1;  // Return invalid value if heap is empty
     }
-    return heap[0].second;  // Retorna apenas o vertex do mínimo
+    return heap[0].second;  // Return only the vertex of the minimum
 }
 
 void MinHeap::pop() {
     if (heap.empty()) {
-        return;  // Se a heap estiver vazia, não faz nada
+        return;  // If heap is empty, do nothing
     }
     std::swap(heap[0], heap.back());
     position[heap[0].second] = 0;
-    position.erase(heap.back().second);  // Remove o último elemento do mapa
+    position.erase(heap.back().second);  // Remove the last element from the map
     heap.pop_back();
     heapify_down(0);
 }

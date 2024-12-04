@@ -1,6 +1,18 @@
 #include "graph.h"
 
-// Implementação da classe EdgeNode
+// Implementation of VertexInfo class
+VertexInfo::VertexInfo(const string& bairro)
+    : m_bairro(bairro) {}
+
+string VertexInfo::bairro() const {
+    return m_bairro;
+}
+
+void VertexInfo::setBairro(const string& bairro) {
+    m_bairro = bairro;
+}
+
+// Implementation of EdgeNode class
 EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int cost, int maxSpeed, EdgeNode* next)
     : m_otherVertex(otherVertex), m_bairro(bairro), m_cost(cost), m_maxSpeed(maxSpeed), m_next(next) {}
 
@@ -28,10 +40,11 @@ void EdgeNode::setNext(EdgeNode* next) {
     m_next = next;
 }
 
-// Implementação da classe GraphAdjList
+// Implementation of GraphAdjList class
 GraphAdjList::GraphAdjList(int numVertices)
     : m_numVertices(numVertices), m_numEdges(0) {
     m_edges = new EdgeNode*[numVertices];
+    m_vertexInfo = new VertexInfo[numVertices];
     for (vertex i = 0; i < numVertices; i++) {
         m_edges[i] = nullptr;
     }
@@ -47,14 +60,15 @@ GraphAdjList::~GraphAdjList() {
         }
     }
     delete[] m_edges;
+    delete[] m_vertexInfo;
 }
 
 void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost, int maxSpeed, bool oneway) {
-    // Adiciona a aresta de v1 para v2
+    // Add edge from v1 to v2
     EdgeNode* edge = m_edges[v1];
     while (edge) {
         if (edge->otherVertex() == v2) {
-            cout << "Aresta já existe entre " << v1 << " e " << v2 << ".\n";
+            // Edge already exists
             return;
         }
         edge = edge->next();
@@ -62,12 +76,13 @@ void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost,
     m_edges[v1] = new EdgeNode(v2, bairro, cost, maxSpeed, m_edges[v1]);
     m_numEdges++;
 
-    // Se não for oneway, adiciona a aresta de v2 para v1
+    // If not oneway, add edge from v2 to v1
     if (!oneway) {
         edge = m_edges[v2];
         while (edge) {
             if (edge->otherVertex() == v1) {
-                return; // Já existe
+                // Edge already exists
+                return;
             }
             edge = edge->next();
         }
@@ -97,16 +112,29 @@ void GraphAdjList::removeEdge(vertex v1, vertex v2) {
 
 void GraphAdjList::print() {
     for (vertex i = 0; i < m_numVertices; i++) {
-        cout << "Vértice " << i << ": ";
+        cout << "Vertex " << i << " (Neighborhood: " << m_vertexInfo[i].bairro() << "): ";
         EdgeNode* edge = m_edges[i];
         while (edge) {
             cout << "-> ("
-                 << "Destino: " << edge->otherVertex()
-                 << ", Bairro: " << edge->bairro()
-                 << ", Peso: " << edge->cost()
-                 << ", Velocidade Máxima: " << edge->maxSpeed() << ") ";
+                 << "Destination: " << edge->otherVertex()
+                 << ", Neighborhood: " << edge->bairro()
+                 << ", Cost: " << edge->cost()
+                 << ", Max Speed: " << edge->maxSpeed() << ") ";
             edge = edge->next();
         }
         cout << "\n";
     }
+}
+
+void GraphAdjList::setVertexBairro(vertex v, const string& bairro) {
+    if (v >= 0 && v < m_numVertices) {
+        m_vertexInfo[v].setBairro(bairro);
+    }
+}
+
+string GraphAdjList::getVertexBairro(vertex v) const {
+    if (v >= 0 && v < m_numVertices) {
+        return m_vertexInfo[v].bairro();
+    }
+    return "";
 }

@@ -1,15 +1,19 @@
 #include "graph.h"
+#include "bus_stop_selection.h"
+#include "mst_construction.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <unordered_map>
+#include <vector>
 
-// Função para determinar o maior índice de vértice no arquivo CSV
+// Function to determine the maximum vertex index in the CSV file
 int getMaxVertex(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo " << filename << std::endl;
+        std::cerr << "Error opening the file " << filename << std::endl;
         return -1;
     }
 
@@ -33,8 +37,8 @@ int getMaxVertex(const std::string& filename) {
             int vDestino = std::stoi(vDestinoStr);
             maxVertex = std::max({maxVertex, vOrigem, vDestino});
         } catch (const std::exception& e) {
-            std::cerr << "Erro ao processar linha: " << line << "\n"
-                      << "Detalhes do erro: " << e.what() << std::endl;
+            std::cerr << "Error processing line: " << line << "\n"
+                      << "Error details: " << e.what() << std::endl;
         }
     }
 
@@ -42,11 +46,11 @@ int getMaxVertex(const std::string& filename) {
     return maxVertex;
 }
 
-// Função para carregar o grafo a partir de um arquivo CSV
+// Function to load the graph from a CSV file
 void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo " << filename << std::endl;
+        std::cerr << "Error opening the file " << filename << std::endl;
         return;
     }
 
@@ -76,17 +80,20 @@ void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
             int length = static_cast<int>(std::stof(lengthStr));
             int maxSpeed = static_cast<int>(std::stof(maxSpeedStr));
 
-            // Valida se os vértices estão dentro dos limites do grafo
             if (vOrigem >= graph.numVertices() || vDestino >= graph.numVertices()) {
-                std::cerr << "Vértices fora do limite: " << vOrigem << ", " << vDestino << std::endl;
+                std::cerr << "Vertices out of bounds: " << vOrigem << ", " << vDestino << std::endl;
                 continue;
             }
 
-            // Adiciona a aresta ao grafo
             graph.addEdge(vOrigem, vDestino, bairro, length, maxSpeed, oneway);
+
+            // Set the neighborhood of the vertices
+            graph.setVertexBairro(vOrigem, bairro);
+            graph.setVertexBairro(vDestino, bairro);
+
         } catch (const std::exception& e) {
-            std::cerr << "Erro ao processar linha: " << line << "\n"
-                      << "Detalhes do erro: " << e.what() << std::endl;
+            std::cerr << "Error processing line: " << line << "\n"
+                      << "Error details: " << e.what() << std::endl;
         }
     }
 
@@ -96,19 +103,33 @@ void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
 int main() {
     const std::string filename = "data.csv";
 
-    // Determina o maior índice de vértice no arquivo CSV
     int maxVertex = getMaxVertex(filename);
     if (maxVertex == -1) {
-        return 1; // Erro ao abrir o arquivo
+        return 1; // Error opening the file
     }
 
-    GraphAdjList graph(maxVertex + 1); // Cria o grafo com base no maior índice de vértice
+    GraphAdjList graph(maxVertex + 1);
 
-    // Carrega o grafo a partir do arquivo CSV
     loadGraphFromCSV(filename, graph);
 
-    // Exibe o grafo
-    graph.print();
+    // Select bus stops
+    std::unordered_map<std::string, vertex> busStops;
+    BusStopSelection::selectBusStops(graph, busStops);
+
+    // Connect bus stops with MST
+    std::vector<std::pair<vertex, vertex>> mstEdges;
+    MSTConstruction::constructMST(graph, busStops, mstEdges);
+
+    // Display the results
+    std::cout << "Selected Bus Stops:\n";
+    for (const auto& pair : busStops) {
+        std::cout << "Neighborhood: " << pair.first << ", Vertex: " << pair.second << "\n";
+    }
+
+    std::cout << "\nMST Edges:\n";
+    for (const auto& edge : mstEdges) {
+        std::cout << "From " << edge.first << " to " << edge.second << "\n";
+    }
 
     return 0;
 }

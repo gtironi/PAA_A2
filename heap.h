@@ -1,23 +1,23 @@
-#ifndef HEAP_H  
-#define HEAP_H  
+#ifndef HEAP_H
+#define HEAP_H
 
 #include <unordered_map>
 #include <vector>
-#include <climits>  // Para usar INT_MAX
+#include <climits>  // For INT_MAX
 
 class MinHeap {
 private:
     std::vector<std::pair<int, int>> heap;  // (priority, vertex)
-    std::unordered_map<int, int> position; // vertex -> index in heap
+    std::unordered_map<int, int> position;  // vertex -> index in heap
 
     void heapify_up(int idx);
     void heapify_down(int idx);
 
 public:
     void insert_or_update(int priority, int vertex);
-    int extract_min();  
-    void pop();         
+    int extract_min();
+    void pop();
     bool empty() const;
 };
 
-#endif  
+#endif // HEAP_H
