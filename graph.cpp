@@ -1,5 +1,4 @@
 #include "graph.h"
-#include <climits>
 
 // Implementação da classe EdgeNode
 EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int maxSpeed, bool oneway, int numLotes, int lotesType[4], EdgeNode* next)
@@ -15,12 +14,14 @@ EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int max
     int numAtracoes = m_lotesType[2];   // Atrações
     int numComercios = m_lotesType[3];  // Comércios
 
-    // Evitar divisão por zero
     if (numAtracoes + numComercios > 0) {
         m_coefficient_lotes = (numCasas + numIndustria) / float(numAtracoes + numComercios);
     } else {
         m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é zero
     }
+
+    // Calcular o custo para construir o metrô
+    m_cost = (rand() % 10) * m_length * 100;
 }
 
 vertex EdgeNode::otherVertex() {
@@ -33,6 +34,10 @@ string EdgeNode::bairro() {
 
 int EdgeNode::length() {
     return m_length;
+}
+
+int EdgeNode::cost() {
+    return m_cost;
 }
 
 int EdgeNode::maxSpeed() {
@@ -146,6 +151,7 @@ void GraphAdjList::print() {
                  << "Destino: " << edge->otherVertex()
                  << ", Bairro: " << edge->bairro()
                  << ", Comprimento: " << edge->length()
+                 << ", Custo: " << edge->cost()
                  << ", Velocidade Máxima: " << edge->maxSpeed()
                  << ", Coeficiente: " << edge->coefficient_lotes() << ") ";
             edge = edge->next();

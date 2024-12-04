@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <climits>
+#include <cstdlib>
 using namespace std;
 
 using vertex = int;
@@ -16,6 +18,7 @@ public:
     vertex otherVertex();
     string bairro();
     int length();
+    int cost();
     int maxSpeed();
     bool isOneway();
     int numLotes();
@@ -28,6 +31,7 @@ private:
     vertex m_otherVertex;   // Vértice
     string m_bairro;        // Bairro
     int m_length;           // Comprimento
+    int m_cost;             // Custo para construir o metro
     int m_maxSpeed;         // Velocidade máxima
     bool m_oneway;          // Direção da aresta (se for unidirecional)
     int m_numLotes;         // Número de lotes
