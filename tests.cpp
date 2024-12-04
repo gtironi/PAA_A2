@@ -2,7 +2,7 @@
 #include <cassert>
 #include "graph.h"
 #include "dijkstra.h"
-#include "prim.h"
+#include "task1.h"
 
 void testDijkstra() {
     // Criar grafo de teste
@@ -61,8 +61,39 @@ void testPrim() {
     std::cout << "Teste Prim passou!\n";
 }
 
+int testTask1() {
+    // Criar o grafo (exemplo)
+    GraphAdjList graph(7);
+    graph.addEdge(0, 1, "Centro", 10, 50, false);
+    graph.addEdge(1, 2, "Centro", 15, 50, false);
+    graph.addEdge(2, 3, "Zona Sul", 12, 50, false);
+    graph.addEdge(3, 4, "Zona Sul", 8, 50, false);
+    graph.addEdge(3, 5, "Zona Sul", 20, 50, false);
+    graph.addEdge(4, 5, "Zona Sul", 8, 50, false);
+    graph.addEdge(5, 6, "Zona Sul", 22, 50, false);
+
+    // Gerar regiões
+    vector<vector<vertex>> regions = generateRegions(graph);
+
+    // Determinar estações de metrô
+    vector<vertex> stations = determineStations(graph, regions);
+
+    // Exibir estações
+    for (size_t i = 0; i < stations.size(); i++) {
+        std::cout << "Region " << i + 1 << " - Estation: " << stations[i] << endl;
+    }
+
+    // Conectando estações - construir MST
+    int totalCost = minimumCostToConnectStations(graph, stations);
+    std::cout << totalCost << endl;
+
+    return 0;
+}
+
+
 int main() {
     testDijkstra();
     testPrim();
+    testTask1();
     return 0;
 }
