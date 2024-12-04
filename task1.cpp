@@ -72,30 +72,52 @@ vector<vertex> determineStations(GraphAdjList& graph, const vector<vector<vertex
     return stations;
 }
 
-//Função para calcular o custo mínimo para conectar todas as estações
+// Função para construir o subgrafo com base nos caminhos mínimos entre as estações
+GraphAdjList buildStationSubgraph(GraphAdjList& graph, const vector<vertex>& stations) {
+    int numStations = stations.size();
+    GraphAdjList subgraph(numStations);
+
+    // Mapear cada estação para o índice no subgrafo
+    unordered_map<vertex, int> stationIndex;
+    for (int i = 0; i < numStations; i++) {
+        stationIndex[stations[i]] = i;
+    }
+
+    // Calcular os menores caminhos entre cada par de estações
+    int parent[graph.numVertices()];
+    int distance[graph.numVertices()];
+
+    for (int i = 0; i < numStations; i++) {
+        Dijkstra::compute(graph, stations[i], parent, distance);
+
+        for (int j = i + 1; j < numStations; j++) {
+            int cost = distance[stations[j]];
+            if (cost < INT_MAX) {
+                subgraph.addEdge(i, j, "Subgraph", cost, 0, false);
+            }
+        }
+    }
+
+    return subgraph;
+}
+
+// Função para calcular o custo mínimo para conectar as estações
 int minimumCostToConnectStations(GraphAdjList& graph, const vector<vertex>& stations) {
-    int n = stations.size();
-    vector<bool> inMST(n, false);
-    priority_queue<pair<int, vertex>, vector<pair<int, vertex>>, greater<>> pq;
+    GraphAdjList subgraph = buildStationSubgraph(graph, stations);
 
+    // Usar o algoritmo de Prim para calcular a MST no subgrafo
+    int numStations = stations.size();
+    int parent[numStations];
+    Prim::mst(subgraph, parent);
+
+    // Calcular o custo total da MST
     int totalCost = 0;
-    pq.push({0, stations[0]});
-
-    while (!pq.empty()) {
-        int cost = pq.top().first;
-        vertex u = pq.top().second;
-        pq.pop();
-
-        if (inMST[u]) continue;
-
-        inMST[u] = true;
-        totalCost += cost;
-
-        EdgeNode* edge = graph.getEdges(u);
+    for (int v = 1; v < numStations; v++) {
+        EdgeNode* edge = subgraph.getEdges(v);
         while (edge) {
-            vertex v = edge->otherVertex();
-            if (!inMST[v]) {
-                pq.push({edge->cost(), v});
+            if (edge->otherVertex() == parent[v]) {
+                totalCost += edge->cost();
+                break;
             }
             edge = edge->next();
         }
