@@ -131,7 +131,7 @@ void testCoeficiente() {
 
 int testTask1() {
     // Criar o grafo (exemplo)
-    GraphAdjList graph(7);
+    GraphAdjList graph(10);
     graph.addEdge(0, 1, "Centro", 10, 50, false);
     graph.addEdge(1, 2, "Centro", 15, 50, false);
     graph.addEdge(2, 3, "Zona Sul", 12, 50, false);
@@ -139,6 +139,10 @@ int testTask1() {
     graph.addEdge(3, 5, "Zona Sul", 20, 50, false);
     graph.addEdge(4, 5, "Zona Sul", 8, 50, false);
     graph.addEdge(5, 6, "Zona Sul", 22, 50, false);
+    graph.addEdge(0, 6, "Barra", 25, 50, false);
+    graph.addEdge(0, 7, "Barra", 30, 50, false);
+    graph.addEdge(7, 6, "Barra", 35, 50, false);
+    graph.addEdge(7, 5, "Barra", 40, 50, false);
 
     // Gerar regiões
     vector<vector<vertex>> regions = generateRegions(graph);
