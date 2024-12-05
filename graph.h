@@ -27,6 +27,8 @@ public:
     EdgeNode* next();
     void setNext(EdgeNode* next);
 
+    float traffic_multiplier;    // Tráfego na aresta
+
 private:
     vertex m_otherVertex;   // Vértice
     string m_bairro;        // Bairro

@@ -1,4 +1,5 @@
 #include "graph.h"
+#include "trafficAPI.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -125,6 +126,11 @@ int main() {
 
     // Carrega o grafo a partir do arquivo CSV
     loadGraphFromCSV(filename, graph);
+
+    TrafficAPI trafficAPI;
+
+    // Atualiza os multiplicadores de tráfego
+    trafficAPI.updateTraffic(graph);
 
     // Exibe o grafo
     graph.print();
