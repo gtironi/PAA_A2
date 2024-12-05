@@ -4,7 +4,7 @@
 IntNode::IntNode(int value) : data(value), next(nullptr) {}
 
 // Implementação do construtor de ListNode
-ListNode::ListNode(int meio, int tempo) 
+ListNode::ListNode(int meio, float tempo) 
     : meioDeTransporte(meio), tempoCaminho(tempo), subList(nullptr), next(nullptr) {}
 
 // Implementação do construtor de IntList
@@ -54,7 +54,7 @@ void IntList::clear() {
 NodeList::NodeList() : head(nullptr) {}
 
 // Implementação de append para NodeList
-void NodeList::append(int meioDeTransporte, int tempoCaminho, IntList* subList) {
+void NodeList::append(int meioDeTransporte, float tempoCaminho, IntList* subList) {
     ListNode* newNode = new ListNode(meioDeTransporte, tempoCaminho);
     newNode->subList = subList ? subList->head : nullptr;
     if (!head) {

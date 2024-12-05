@@ -15,11 +15,11 @@ struct IntNode {
 // Estrutura para a lista de nós com sub-listas
 struct ListNode {
     int meioDeTransporte;  // Inteiro representando o meio de transporte
-    int tempoCaminho;      // Inteiro representando o tempo do caminho
+    float tempoCaminho;      // Inteiro representando o tempo do caminho
     IntNode* subList;      // Ponteiro para uma sub-lista de inteiros
     ListNode* next;        // Ponteiro para o próximo nó na lista principal
 
-    ListNode(int meio, int tempo); // Construtor
+    ListNode(int meio, float tempo); // Construtor
 };
 
 // Estrutura para manipular a lista de inteiros
@@ -38,7 +38,7 @@ struct NodeList {
     ListNode* head;  // Ponteiro para o início da lista
 
     NodeList();                                   // Construtor
-    void append(int meioDeTransporte, int tempoCaminho, IntList* subList = nullptr); 
+    void append(int meioDeTransporte, float tempoCaminho, IntList* subList = nullptr); 
                                                  // Adiciona um nó à lista
     void print();                                // Imprime os nós e suas sub-listas
     void clear();                                // Limpa a memória da lista

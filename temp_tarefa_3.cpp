@@ -42,8 +42,9 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
     // combino os dois vetores parent para achar a rota
     
     // Distância máxima que da para andar de taxi com o custo
-    int distMax = (int)(custoMax/10);//taxa taxi
+    int distMax = (int)(custoMax/10); //taxa taxi
     int vertice = destino;
+    int parada = destino;
     Dijkstra dijkstra;
     float tempoTaxi =0;
     if (distMax >=1){ // se dist_max<1 quer dizer que o usuário não tem dinheiro para andar de taxi, pois o valor mínimo de uma corrida é igual a TAXA
