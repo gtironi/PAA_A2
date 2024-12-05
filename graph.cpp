@@ -162,7 +162,7 @@ void GraphAdjList::print() {
     }
 }
 
-void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
+void GraphAdjList::splitEdge(vertex vi, vertex vj, int distRestante) {
     // Verifica se vi e vj são válidos
     if (vi >= m_numVertices || vj >= m_numVertices || vi < 0 || vj < 0) {
         cerr << "Erro: Vértices fora do limite.\n";
@@ -175,12 +175,14 @@ void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
     int cost = -1;
     std::string bairro;
     int maxSpeed = -1;
+    int numLotes = -1;
 
     while (edge != nullptr) {
         if (edge->otherVertex() == vj) {
-            cost = edge->cost();
+            cost = edge->length();
             bairro = edge->bairro();
             maxSpeed = edge->maxSpeed();
+            numLotes = edge->numLotes();
             break;
         }
         prev = edge;
@@ -221,34 +223,36 @@ void GraphAdjList::splitEdge(int vi, int vj, int distRestante) {
     }
 
     // Cria um novo vértice vk
-    int vk = m_numVertices++;
+    vertex vk = m_numVertices++;
     EdgeNode** newEdges = new EdgeNode*[m_numVertices];
-    for (int i = 0; i < m_numVertices - 1; ++i) {
+    for (vertex i = 0; i < m_numVertices - 1; ++i) {
         newEdges[i] = m_edges[i];
     }
     newEdges[m_numVertices - 1] = nullptr;
     delete[] m_edges;
     m_edges = newEdges;
 
+    int lotesType[4] = {1, 0, 0, 0};
     // Adiciona as novas arestas (vi, vk), (vk, vi), (vj, vk) e (vk, vj)
-    addEdge(vi, vk, bairro, distRestante, maxSpeed, false);
+    addEdge(vi, vk, bairro, distRestante, maxSpeed, false, (int)((distRestante/cost)*numLotes), lotesType);
     // addEdge(vk, vi, bairro, distRestante, maxSpeed, false);
-    addEdge(vj, vk, bairro, cost - distRestante, maxSpeed, false);
+    addEdge(vj, vk, bairro, cost - distRestante, maxSpeed, false, (int)((distRestante/cost)*numLotes), lotesType);
     // addEdge(vk, vj, bairro, cost - distRestante, maxSpeed, false);
 }
 
 GraphAdjList* GraphAdjList::clone() const {
     // Cria um novo grafo com o mesmo número de vértices
     GraphAdjList* newGraph = new GraphAdjList(m_numVertices);
+    int lotesType[4] = {1, 0, 0, 0};
 
     // Copia todas as arestas
-    for (int i = 0; i < m_numVertices; ++i) {
+    for (vertex i = 0; i < m_numVertices; ++i) {
         EdgeNode* current = m_edges[i];
         EdgeNode* previous = nullptr;
 
         while (current) {
             EdgeNode* newEdge = new EdgeNode(current->otherVertex(), current->bairro(),
-                                             current->cost(), current->maxSpeed(), nullptr);
+                                             current->length(), current->maxSpeed(), true, current->numLotes(), lotesType, nullptr);
 
             if (!previous) {
                 newGraph->m_edges[i] = newEdge; // Primeira aresta na lista
@@ -272,20 +276,22 @@ GraphAdjList* GraphAdjList::clone() const {
 GraphAdjList* GraphAdjList::createBidirectionalCopy() const {
     // Cria um novo grafo com o mesmo número de vértices
     GraphAdjList* bidirectionalGraph = new GraphAdjList(m_numVertices);
+    int lotesType[4] = {1, 0, 0, 0};
 
     // Percorre cada vértice do grafo original
-    for (int i = 0; i < m_numVertices; ++i) {
+    for (vertex i = 0; i < m_numVertices; ++i) {
         EdgeNode* edge = m_edges[i];
 
         // Percorre todas as arestas do vértice atual
         while (edge != nullptr) {
             vertex j = edge->otherVertex();
             string bairro = edge->bairro();
-            int cost = edge->cost();
+            int cost = edge->length();
             int maxSpeed = edge->maxSpeed();
+            int numLotes = edge->numLotes();
 
             // Adiciona as arestas (i, j) e (j, i) no grafo bidirecional
-            bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false);
+            bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false, numLotes, lotesType);
             // bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
 
             edge = edge->next();

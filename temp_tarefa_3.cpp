@@ -103,7 +103,7 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
     }
     caminhoCaminhada.insert_front(vertice);
 
-    float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, graphCompleto.numVertices()-1, destino, parentCaminhada);
+    float tempoCaminhada = calculaTempoCaminhada(graphCompleto, graphCompleto.numVertices()-1, destino, parentCaminhada);
     rota.append(0, tempoCaminhada, &caminhoCaminhada);
 
     return tempoTaxi + tempoCaminhada;

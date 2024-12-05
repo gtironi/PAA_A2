@@ -13,7 +13,7 @@ float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parent
     float tempo = 0.0f;
     int v_max;
     int cost;
-    float modf_transito = 0.9; // Modificador do trânsito (fixo por enquanto)
+    float modf_transito;
     int vertice = destino;
 
     while (vertice != parentTaxi[vertice]) {
@@ -24,14 +24,14 @@ float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parent
         while (edge) {
             int v2 = edge->otherVertex();
             if (v2 == vertice) {
-                cost = edge->cost();
+                cost = edge->length();
                 v_max = edge->maxSpeed();
-                // modf_transito = edge->trafic();
+                modf_transito = edge->traffic_multiplier;
                 tempo += cost / (v_max * modf_transito);
                 encontrou = true;
                 break;
             }
-            edge = edge->next(); // Próxima aresta
+            edge = edge->next();
         }
 
         if (!encontrou) {
@@ -43,20 +43,6 @@ float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parent
         // Atualiza o vértice para o pai
         vertice = parentTaxi[vertice];
     }
-
-    // // Caso haja uma distância restante a ser percorrida
-    // if (distRestante != 0) {
-    //     EdgeNode* edge = graph.getEdges(destino);
-    //     while (edge) {
-    //         int v2 = edge->otherVertex();
-    //         if (v2 == filho) {
-    //             v_max = edge->maxSpeed();
-    //             tempo += distRestante / (v_max * modf_transito);
-    //             break;
-    //         }
-    //         edge = edge->next();
-    //     }
-    // }
 
     return tempo;
 }
@@ -74,9 +60,7 @@ float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* p
         while (edge) {
             int v2 = edge->otherVertex();
             if (v2 == vertice) {
-                int cost = edge->cost();
-                int v_max = edge->maxSpeed();
-                float modf_transito = 0.9; // Modificador de trânsito (fixo por enquanto)
+                int cost = edge->length();
                 tempo += cost / 5;
                 encontrou = true;
                 break;
@@ -97,14 +81,7 @@ float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* p
     return tempo;
 }
 
-float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax){
-    // custo/taxa = distância maxima que consigo andar de taxi
-    // dijkstra até eu chegar no vértice do destino
-    // pego o parent e vejo até onde deu para chegar de taxi
-    // faço um dijkstra, agora considerando o grafo completo, saindo do vértice que deu pra chegar de taxi
-    // pego os dois vetores parent e vejo o tempo que demorou para cada caminho
-    // combino os dois vetores parent para achar a rota
-    
+float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax){    
     // Distância máxima que da para andar de taxi com o custo
     int distMax = (int)(custoMax/4);//taxa taxi
     int vertice = destino;
@@ -129,6 +106,7 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
                 dist = distanceTaxi[vertice];
                 if (dist < distMax){
                     caminhoTaxi.insert_front(vertice);
+                    parada = vertice;
                     insertOnList = true;
                 } // no momento que acha um vértice que da para chegar de taxi quebra
             } else{
@@ -140,23 +118,15 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
 
         
         // Se conseguir chegar no destino só de taxi acaba
-        if (vertice == destino){
+        if (parada == destino){
             float tempo = calculaTempoTaxi(graphDirecionado, origem, destino, parentTaxi);
             rota.append(1, tempo, &caminhoTaxi);
             return tempo;
         }
-
-        // // Calcula distancia restante que da para andar na rua seguinte ao último vértice que deu pra chegar de taxi
-        // // Vamos andar essa distância de taxi
-        // int distRestante = dist - distMax;
-        // // Cria vértice no lugar em que ele parou de taxi na rua, dessa forma podemos fazer dijkstra a partir dele
-        // graphCompleto.splitEdge(vertice, finalRua, distRestante);
-        // parada = graphCompleto.numVertices()-1;
-        // caminhoTaxi.append(parada);
         
         // Calcula tempo da viagem de taxi
-        if (vertice != origem){
-            tempoTaxi  = calculaTempoTaxi(graphDirecionado, origem, vertice, parentTaxi);
+        if (insertOnList){
+            tempoTaxi  = calculaTempoTaxi(graphDirecionado, origem, parada, parentTaxi);
             rota.append(1, tempoTaxi, &caminhoTaxi); // adicionamos o caminho do taxi na rota
         }
     }
@@ -215,47 +185,48 @@ int main() {
     int stdSizeEdge = 100;
     int stdMaxSpeed = 60;
     bool oneWay = true;
+    int lotesType[4] = {1, 0, 0, 0};
+    int numLotes = 100;
 
     // Adiciona arestas
-    graphTaxi.addEdge(0, 1, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(0, 2, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(10, 12, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(11, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphTaxi.addEdge(0, 1, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(0, 2, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(10, 12, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, numLotes, lotesType);
+    graphTaxi.addEdge(11, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
 
     // Grafo de metro pra teste
     GraphAdjList graphMetro(13);
 
     // Copiando aresta dos vértices 4 a 9
-    graphMetro.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
+    graphMetro.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
 
     GraphAdjList* graphMetroBidirectional = graphMetro.createBidirectionalCopy();
 
     // cout << "Printando grafo de metro: " << endl;
     // graphMetroBidirectional->print();   
-    melhorRota(graphTaxi, 0, 3, 100);
-
+    melhorRota(graphTaxi, 0, 3, 100000);
 
     return 0;
 }
