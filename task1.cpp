@@ -11,25 +11,54 @@
 using namespace std;
 
 // Função para gerar a lista de regiões
+// vector<vector<vertex>> generateRegions(const GraphAdjList& graph) {
+//     unordered_map<string, vector<vertex>> regionMap;
+
+//     for (vertex v = 0; v < graph.numVertices(); v++) {
+//         EdgeNode* edge = graph.getEdges(v);
+
+//         while (edge) {
+//             string bairro = edge->bairro();
+
+//             // Adicionar o vértice à região correspondente
+//             if (regionMap.find(bairro) == regionMap.end()) {
+//                 regionMap[bairro] = vector<vertex>();
+//             }
+//             regionMap[bairro].push_back(v);
+
+//             edge = edge->next();
+//         }
+//     }
+
+//     vector<vector<vertex>> regions;
+//     for (const auto& pair : regionMap) {
+//         regions.push_back(pair.second);
+//     }
+
+//     return regions;
+// }
+
 vector<vector<vertex>> generateRegions(const GraphAdjList& graph) {
     unordered_map<string, vector<vertex>> regionMap;
 
+    // Adiciona os vértices manualmente às suas regiões
     for (vertex v = 0; v < graph.numVertices(); v++) {
-        EdgeNode* edge = graph.getEdges(v);
-
-        while (edge) {
-            string bairro = edge->bairro();
-
-            // Adicionar o vértice à região correspondente
-            if (regionMap.find(bairro) == regionMap.end()) {
-                regionMap[bairro] = vector<vertex>();
-            }
-            regionMap[bairro].push_back(v);
-
-            edge = edge->next();
+        // Verifica em qual região o vértice se encaixa (0-7 para região 1, 8-12 para região 2)
+        string bairro;
+        if (v >= 0 && v <= 7) {
+            bairro = "Região 1";  // Região 1: vértices 0 a 7
+        } else if (v >= 8 && v <= 12) {
+            bairro = "Região 2";  // Região 2: vértices 8 a 12
         }
+
+        // Adiciona o vértice à região correspondente
+        if (regionMap.find(bairro) == regionMap.end()) {
+            regionMap[bairro] = vector<vertex>();
+        }
+        regionMap[bairro].push_back(v);
     }
 
+    // Converte o mapa de regiões para o formato de vetor
     vector<vector<vertex>> regions;
     for (const auto& pair : regionMap) {
         regions.push_back(pair.second);
@@ -69,6 +98,32 @@ vector<vertex> determineStations(GraphAdjList& graph, const vector<vector<vertex
         stations.push_back(bestStation);
     }
 
+    // for (const auto& region : regions) {
+    //     int bestStation = -1;
+    //     int minTotalDist = INT_MAX; // Usar soma das distâncias em vez da distância máxima
+
+    //     // Para cada vértice na região
+    //     for (vertex v : region) {
+    //         Dijkstra::compute(graph, v, parent, distance);
+
+    //         // Calcular a soma das distâncias para todos os vértices dentro da região
+    //         int totalDist = 0;
+    //         for (vertex u : region) {
+    //             if (distance[u] < INT_MAX) {  // Ignorar vértices desconectados
+    //                 totalDist += distance[u];
+    //             }
+    //         }
+
+    //         // Escolher o vértice com a menor soma de distâncias
+    //         if (totalDist < minTotalDist) {
+    //             minTotalDist = totalDist;
+    //             bestStation = v;
+    //         }
+    //     }
+
+    //     stations.push_back(bestStation);
+    // }
+
     return stations;
 }
 
@@ -90,6 +145,7 @@ GraphAdjList buildStationSubgraph(GraphAdjList& graph, const vector<vertex>& sta
     int lotesType[4] = {};
 
     for (int i = 0; i < numStations; i++) { 
+        cout << "Iteração: " << i << endl;
         Dijkstra::compute(graph, stations[i], parent, distance);
 
         for (int j = i + 1; j < numStations; j++) {

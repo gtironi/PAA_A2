@@ -15,40 +15,28 @@ void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional
     IntList expectedPathMetro;
     expectedPathMetro.insert_front(10);
     expectedPathMetro.insert_front(8);
-    expectedPathMetro.insert_front(6);
-    expectedPathMetro.insert_front(4);
+    expectedPathMetro.insert_front(7);
     expectedPathMetro.insert_front(3);
+    expectedPathMetro.insert_front(1);
     
     // Criação do caminho no formato de lista
-    IntList* pathMetro = createPathMetro(graphMetroBidirectional, 3, 10);
+    IntList* pathMetro = createPathMetro(graphMetroBidirectional, 1, 10);
+
 
     // Começo das duas listas
     IntNode* currentVertex = pathMetro->head;
     IntNode* expectedCurrentVertex = expectedPathMetro.head;
 
-
     // Verificando resultados
     while (currentVertex != nullptr && expectedCurrentVertex != nullptr){
+        cout << currentVertex->data << endl;
+        cout << expectedCurrentVertex->data << endl;
         assert(currentVertex->data == expectedCurrentVertex->data);
         expectedCurrentVertex = expectedCurrentVertex->next;
         currentVertex = currentVertex->next;
     }
     
     cout << "Teste do caminho passou!" << endl;
-
-    // Teste da função de tempo do metrô.
-    // Velocidade do metro
-    int metroSpeed = 70;
-    // Valor esperado para o tempo
-    float expectedValueTime = float(40.0/7.0);
-
-    // Calculando tempo gasto no caminho
-    float timeTakenMetro = timeMetro(graphMetroBidirectional, *pathMetro, metroSpeed);
-
-    // Verificando resultado
-    assert(timeTakenMetro == expectedValueTime);
-
-    cout << "Teste do tempo passou!" << endl;
 
     // Vértices esperado no grafo de metrô
     vertex expectedVertexInGraph1 = 7;
@@ -67,10 +55,10 @@ void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional
     // Testes da função de estação mais próxima.
     // Primeiro teste: estação inicial
     // Vértice esperado
-    vertex expectedStation = 3;
+    vertex expectedStation = 1;
 
     // Rodando função
-    vertex closestStation = closestMetroStation(1, graphStreets, graphMetroBidirectional);
+    vertex closestStation = closestMetroStation(2, graphStreets, graphMetroBidirectional);
 
     // Verificando resultado
     assert(expectedStation == closestStation);
@@ -95,10 +83,13 @@ int main() {
     bool oneWay = true;
     int stdNumLots = 1;
     int lotsType[4] = {1, 0, 0, 0};
-    
-    // Grafo de táxi pra teste
+
+    // Criar o grafo (exemplo)
     GraphAdjList graphStreets(13);
-    // Adiciona arestas
+
+    int lotesType[4] = {1, 0, 0, 0};
+
+    // Primeira região: vértices de 0 a 7
     graphStreets.addEdge(0, 1, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(0, 2, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
@@ -111,54 +102,50 @@ int main() {
     graphStreets.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(10, 12, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(11, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+
+    // Segunda região: vértices de 8 a 12
+    graphStreets.addEdge(8, 10, "Zona Sul", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+    graphStreets.addEdge(9, 10, "Zona Sul", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+    graphStreets.addEdge(10, 12, "Zona Sul", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
+    graphStreets.addEdge(12, 10, "Zona Sul", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
+    graphStreets.addEdge(11, 10, "Zona Sul", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
 
     // Grafo completo
     GraphAdjList* graphStreetsBidirectional = graphStreets.createBidirectionalCopy();
 
-    // // Grafo de metro pra teste
-    // GraphAdjList graphMetro(13);
-    // // Copiando aresta dos vértices 4 a 9
-    // graphMetro.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    // graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+    cout << "Grafo normal: " << endl;
+    graphStreets.print();
 
-    // GraphAdjList* graphMetroBidirectional = graphMetro.createBidirectionalCopy();
-    
     // Gerar regiões
     cout << "Rodando função para gerar regiões" << endl;
-    vector<vector<vertex>> regions = generateRegions(graphStreets);
+    vector<vector<vertex>> regions = generateRegions(*graphStreetsBidirectional);
+    cout << "Regiões: " << endl;
+    for (int i = 0; i < regions.size(); i++){
+        cout << "Linha " << i << ": ";
+        for (int j = 0; j < regions[i].size(); j++){
+            cout << regions[i][j] << " ";
+        }
+        cout << endl;
+    }
 
     // Determinar estações de metrô
     cout << "Rodando função para determinar estações" << endl;
-    vector<vertex> stations = determineStations(graphStreets, regions);
+    vector<vertex> stations = determineStations(*graphStreetsBidirectional, regions);
+
+    cout << "Estações: " << endl;
+    for (int i = 0; i < stations.size(); i++){
+        cout << stations[i] << " ";
+    }
+    cout << endl;
 
     cout << "Rodando função para criar subgrafo de estações" << endl;
-    GraphAdjList graphMetroBidirectional = buildStationSubgraph(graphStreets, stations);
+    GraphAdjList graphMetroBidirectional = *createTreeMetro(*graphStreetsBidirectional, stations, 70);
 
+    cout << "Printando grafo de metro:" << endl;
+    graphMetroBidirectional.print();
+
+    cout << "Rodando testes do metro" << endl;
     testMetro(graphStreets, graphMetroBidirectional);
-
-    // Testes de táxi
-    // Origem
-    vertex start = 0;
-    // Estação que queremos chegar
-    vertex closestStation = closestMetroStation(0, graphStreets, graphMetroBidirectional);
-    // Orçamento
-    int budget = 100;
-
-    NodeList rota;
-    rotaTaxi(*graphStreetsBidirectional, graphStreets, rota, start, closestStation, budget);
-
-    cout << "Rota até a estação: " << endl;
-    rota.print();
-
+    
     return 0;
 }

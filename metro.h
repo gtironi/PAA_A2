@@ -2,6 +2,7 @@
 #define METRO_H
 
 #include <iostream>
+#include <vector>
 
 #include "graph.h"
 #include "dijkstra.h"
@@ -10,6 +11,11 @@
 
 using namespace std;
 
+GraphAdjList* createTreeMetro(GraphAdjList& graphStreets, const vector<vertex>& stations, int metroSpeed);
+
+vector<vector<vertex>> getRegionsAsMatrix(const GraphAdjList& graph);
+
+vector<vertex> findRegionCenters(GraphAdjList& graph, const vector<vector<vertex>>& regions);
 
 IntList* createPathMetro(GraphAdjList& graphMetro, int start, int end);
 

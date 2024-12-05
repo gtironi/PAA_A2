@@ -1,8 +1,29 @@
 #include "graph.h"
 
 // Implementação da classe EdgeNode
-EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int cost, int maxSpeed, EdgeNode* next)
-    : m_otherVertex(otherVertex), m_bairro(bairro), m_cost(cost), m_maxSpeed(maxSpeed), m_next(next) {}
+EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int cost, int maxSpeed, bool oneWay, int numLotes, int* lotesType, EdgeNode* next)
+    : m_otherVertex(otherVertex), m_bairro(bairro), m_length(cost), m_maxSpeed(maxSpeed), m_oneway(oneWay), m_numLotes(numLotes), m_next(next) {    
+    
+    for (int i = 0; i < 4; ++i) {
+        m_lotesType[i] = lotesType[i];
+    }
+
+    // Calcular o coeficiente de atratividade
+    int numCasas = m_lotesType[0];      // Casas
+    int numIndustria = m_lotesType[1];  // Indústrias
+    int numAtracoes = m_lotesType[2];   // Atrações
+    int numComercios = m_lotesType[3];  // Comércios
+
+    if (numAtracoes + numComercios > 0) {
+        m_coefficient_lotes = (numCasas + numIndustria) / float(numAtracoes + numComercios);
+    } else {
+        m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é zero
+    }
+
+    // Calcular o custo para construir o metrô
+    // m_cost = (rand() % 10) * m_length * 100;
+    m_cost = m_length;
+}
 
 vertex EdgeNode::otherVertex() {
     return m_otherVertex;
@@ -22,6 +43,28 @@ int EdgeNode::maxSpeed() {
 
 EdgeNode* EdgeNode::next() {
     return m_next;
+}
+
+int EdgeNode::length() {
+    return m_length;
+}
+
+int EdgeNode::numLotes() {
+    return m_numLotes;
+}
+
+float EdgeNode::coefficient_lotes() {
+    return m_coefficient_lotes;
+}
+
+bool EdgeNode::isOneway() {
+    return m_oneway;
+}
+
+void EdgeNode::getLotesType(int lotesType[4]) {
+    for (int i = 0; i < 4; ++i) {
+        lotesType[i] = m_lotesType[i];
+    }
 }
 
 void EdgeNode::setNext(EdgeNode* next) {
@@ -49,7 +92,7 @@ GraphAdjList::~GraphAdjList() {
     delete[] m_edges;
 }
 
-void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost, int maxSpeed, bool oneway) {
+void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost, int maxSpeed, bool oneway, int numLotes, int lotesType[4]) {
     // Adiciona a aresta de v1 para v2
     EdgeNode* edge = m_edges[v1];
     while (edge) {
@@ -59,7 +102,7 @@ void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost,
         }
         edge = edge->next();
     }
-    m_edges[v1] = new EdgeNode(v2, bairro, cost, maxSpeed, m_edges[v1]);
+    m_edges[v1] = new EdgeNode(v2, bairro, cost, maxSpeed, oneway, numLotes, lotesType, m_edges[v1]);
     m_numEdges++;
 
     // Se não for oneway, adiciona a aresta de v2 para v1
@@ -71,7 +114,7 @@ void GraphAdjList::addEdge(vertex v1, vertex v2, const string& bairro, int cost,
             }
             edge = edge->next();
         }
-        m_edges[v2] = new EdgeNode(v1, bairro, cost, maxSpeed, m_edges[v2]);
+        m_edges[v2] = new EdgeNode(v1, bairro, cost, maxSpeed, oneway, numLotes, lotesType, m_edges[v2]);
         m_numEdges++;
     }
 }
