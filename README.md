@@ -16,3 +16,9 @@ Para executar o modulo de solução para a tarefa 1:
 ```.\tarefa_1.exe```
 
 ---
+
+Para executar a solução da tarefa 2:
+
+```g++ -o bus bus.cpp -std=c++17```
+
+```.\bus.exe```
