@@ -143,31 +143,4 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
     return tempoTaxi + tempoCaminhada;
 }
 
-void melhorRota(GraphAdjList& graph, int origem, int destino, int custoMax) {
-    NodeList rota;
-    GraphAdjList* graphCompleto = graph.createBidirectionalCopy();
-    GraphAdjList* graphDirecionado = graph.clone();
-    
-    cout << "COMEÇOU" << endl;
-    cout << "===================================" << endl;
-    // int distOrigem = enderecoToDist(enderecoOrigem);
-    // int distDestino = enderecoToDist(enderecoDestino);
-    
-    // graphCompleto->splitEdge(enderecoOrigem.vi, enderecoOrigem.vj, distOrigem);
-    // graphCompleto->splitEdge(enderecoDestino.vi, enderecoDestino.vj, distDestino);
-    // graphDirecionado->splitEdge(enderecoOrigem.vi, enderecoOrigem.vj, distOrigem);
-    // graphDirecionado->splitEdge(enderecoDestino.vi, enderecoDestino.vj, distDestino);
-
-    // int origem = (graphCompleto->numVertices())-2;
-    // int destino = (graphCompleto->numVertices())-1;
-
-    float tempoTaxi = rotaTaxi(*graphCompleto, *graphDirecionado, rota, origem, destino, custoMax);
-    rota.print();
-    // float tempoMetro = rotaMetro(graph, rota, custoMax);
-    // float tempoOnibus = rotaOnibus(graph, rota, custoMax);
-    // float tempoMetroOnibus = rotaMetroOnibus(graph, rota, custoMax);
-    cout << "===================================" << endl;
-    cout << "FIM" << endl;
-    return;
-}
 

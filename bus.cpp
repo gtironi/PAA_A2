@@ -17,6 +17,8 @@ using namespace chrono;
 #include "graph.h"
 #include "dijkstra.h"
 #include "prim.h"
+#include "list.h"
+#include "taxi.h"
 
 unordered_map<std::string, std::pair<vertex, vertex>> selecionarArestasMinimasPorBairro(GraphAdjList& grafo) {
     std::unordered_map<std::string, std::pair<vertex, vertex>> arestasMinimasPorBairro;
