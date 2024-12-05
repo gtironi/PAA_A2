@@ -1,14 +1,14 @@
 #include "graph.h"
 
-// Implementação da classe EdgeNode
+// Implementação da classe EdgeNode ------------------------------------------
 EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int maxSpeed, bool oneway, int numLotes, int lotesType[4], EdgeNode* next)
-    : m_otherVertex(otherVertex), m_bairro(bairro), m_length(length), m_maxSpeed(maxSpeed), m_oneway(oneway), m_numLotes(numLotes), m_next(next) {
+    : m_otherVertex(otherVertex), m_bairro(bairro), m_length(length), m_maxSpeed(maxSpeed), traffic_multiplier(1.0f), m_oneway(oneway), m_numLotes(numLotes), m_next(next) {
     // Copiar o tipo de lotes
     for (int i = 0; i < 4; ++i) {
         m_lotesType[i] = lotesType[i];
     }
 
-    // Calcular o coeficiente de atratividade
+    // Calculo do coeficiente de atratividade
     int numCasas = m_lotesType[0];      // Casas
     int numIndustria = m_lotesType[1];  // Indústrias
     int numAtracoes = m_lotesType[2];   // Atrações
@@ -17,13 +17,14 @@ EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int max
     if (numAtracoes + numComercios > 0) {
         m_coefficient_lotes = (numCasas + numIndustria) / float(numAtracoes + numComercios);
     } else {
-        m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é zero
+        m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é inf
     }
 
     // Calcular o custo para construir o metrô
     m_cost = (rand() % 10) * m_length * 100;
 }
 
+// Funções para acessar os atributos
 vertex EdgeNode::otherVertex() {
     return m_otherVertex;
 }
@@ -70,7 +71,7 @@ void EdgeNode::setNext(EdgeNode* next) {
     m_next = next;
 }
 
-// Implementação da classe GraphAdjList
+// Implementação da classe GraphAdjList ------------------------------------------
 GraphAdjList::GraphAdjList(int numVertices)
     : m_numVertices(numVertices), m_numEdges(0), m_numBairros(0) {
     m_edges = new EdgeNode*[numVertices];
@@ -150,6 +151,7 @@ void GraphAdjList::print() {
             cout << "-> ("
                  << "Destino: " << edge->otherVertex()
                  << ", Bairro: " << edge->bairro()
+                 << ", Transito: " << edge-> traffic_multiplier
                  << ", Comprimento: " << edge->length()
                  << ", Custo: " << edge->cost()
                  << ", Velocidade Máxima: " << edge->maxSpeed()
