@@ -11,8 +11,8 @@ Este projeto visa resolver problemas de planejamento e roteamento de transporte 
 
 Para executar o modulo de solução para a tarefa 1:
 
-g++ -o tarefa_1 tarefa_1.cpp -std=c++17
+```g++ -o tarefa_1 tarefa_1.cpp -std=c++17```
 
-.\tarefa_1.exe
+```.\tarefa_1.exe```
 
 ---
