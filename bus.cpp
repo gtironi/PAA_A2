@@ -19,6 +19,8 @@ using namespace chrono;
 #include "prim.h"
 #include "list.h"
 #include "taxi.h"
+#include "bus.h"
+#include "utills.h"
 
 unordered_map<std::string, std::pair<vertex, vertex>> selecionarArestasMinimasPorBairro(GraphAdjList& grafo) {
     std::unordered_map<std::string, std::pair<vertex, vertex>> arestasMinimasPorBairro;
@@ -155,7 +157,46 @@ void testarDesempenho() {
     dataFile.close();
 }
 
-float rotaOnibus(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, std::vector<vertex> linhaOnibus, NodeList& rota, int origem, int destino, float custoMax) {
+float calculaTempoOnibus(GraphAdjList& graph, IntList& caminhoOnibus) {
+    float tempo = 0.0f;
+
+    // Obtém o primeiro nó da lista
+    IntNode* current = caminhoOnibus.head;
+
+    // Itera pelos pares consecutivos de nós
+    while (current && current->next) {
+        int u = current->data;
+        int v = current->next->data;
+
+        // Busca a aresta conectando u a v
+        EdgeNode* edge = graph.getEdges(u);
+        bool encontrou = false;
+
+        while (edge) {
+            int v2 = edge->otherVertex();
+            if (v2 == v) {
+                int cost = edge->length();
+                int v_max = edge->maxSpeed();
+                float modf_transito = edge->traffic_multiplier;
+                tempo += cost / (v_max * modf_transito);
+                encontrou = true;
+                break;
+            }
+            edge = edge->next();
+        }
+
+        if (!encontrou) {
+            cerr << "Erro: Não foi encontrada uma aresta entre " << u << " e " << v << endl;
+            break;
+        }
+
+        // Avança para o próximo nó
+        current = current->next;
+    }
+
+    return tempo;
+}
+float rotaOnibus(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, std::vector<vertex> linhaOnibus, NodeList& rota, int origem, int destino, float custoMax, float horaAtual) {
     // Custo do ônibus
     const float CUSTO_ONIBUS = 4.50;
 
@@ -190,12 +231,12 @@ float rotaOnibus(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, st
         if (distanceOrigem[v] < menorDistOrigem) {
             menorDistOrigem = distanceOrigem[v];
             embarque = v;
-            int idx_embarque = i;
+            idx_embarque = i;
         }
         if (distanceDestino[v] < menorDistDestino) {
             menorDistDestino = distanceDestino[v];
             desembarque = v;
-            int idx_desembarque = i;
+            idx_desembarque = i;
         }
     }
 
@@ -205,60 +246,72 @@ float rotaOnibus(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, st
     }
 
     IntList caminhoOnibus;
-    bool continua = true;
     int i=idx_embarque;
     while (i!=idx_desembarque) {
-        caminhoOnibus.append(i);
+        caminhoOnibus.append(linhaOnibus[i]);
         i++;
-        if (i==linhaOnibus.size()){i=0;}
+        if (i==linhaOnibus.size() - 1){i=0;}
     }
-    caminhoOnibus.append(i);
+    caminhoOnibus.append(linhaOnibus[i]);
+
+
+    float tempoOnibus = 0;
+    float tempoSaida = 0;
+    float tempoIda = 0;
+    float horario = horaAtual;
     
-    float tempoIda = rotaTaxi(graphCompleto, graphDirecionado, rota, origem, embarque, custoMax, custoMax);
-    float tempoOnibus = calculaTempoTaxi(graphDirecionado, embarque, desembarque, caminhoOnibus);
-    rota.append(0, tempoOnibus, &caminhoOnibus);
-    float tempoSaida = rotaTaxi(graphCompleto, graphDirecionado, rota, desembarque, destino, custoMax, custoMax);
-    
+    if (embarque != desembarque){
+        tempoIda = rotaTaxi(graphCompleto, graphDirecionado, rota, origem, embarque, custoMax, custoMax);
+        // if (embarque != destino){
+        horario += tempoIda;
+        tempoOnibus = calculaTempoOnibus(graphDirecionado, caminhoOnibus);
+        tempoOnibus += calcularFaltante(horario);
+        rota.append(BUS_CODE, tempoOnibus, &caminhoOnibus);
+        // }
+        tempoSaida = rotaTaxi(graphCompleto, graphDirecionado, rota, desembarque, destino, custoMax, custoMax);
+    } else{
+        tempoSaida = rotaTaxi(graphCompleto, graphDirecionado, rota, origem, destino, custoMax, custoMax);
+    }
 
     return tempoIda + tempoOnibus + tempoSaida;
 }
 
-int main() {
+// int main() {
 
-    int lotesType[4] = {1, 0, 0, 0};
+//     int lotesType[4] = {1, 0, 0, 0};
 
-    // Criação do grafo de teste com 10 vértices
-    GraphAdjList grafo(10);
-    grafo.addEdge(0, 1, "BairroA", 10, 50, false, 1, lotesType);
-    grafo.addEdge(1, 2, "BairroA", 20, 40, false, 1, lotesType);
-    grafo.addEdge(2, 3, "BairroA", 15, 45, false, 1, lotesType);
-    grafo.addEdge(3, 4, "BairroA", 20, 35, false, 1, lotesType);
-    grafo.addEdge(1, 3, "BairroA", 5, 35, false, 1, lotesType);
-    grafo.addEdge(0, 4, "BairroA", 10, 35, false, 1, lotesType);
-    grafo.addEdge(4, 5, "BairroA", 30, 40, false, 1, lotesType);
-    grafo.addEdge(9, 0, "BairroB", 25, 45, false, 1, lotesType);
-    grafo.addEdge(5, 6, "BairroB", 10, 60, false, 1, lotesType);
-    grafo.addEdge(6, 7, "BairroB", 25, 55, false, 1, lotesType);
-    grafo.addEdge(6, 9, "BairroB", 25, 55, false, 1, lotesType);
-    grafo.addEdge(7, 8, "BairroB", 35, 50, false, 1, lotesType);
-    grafo.addEdge(8, 9, "BairroB", 40, 45, false, 1, lotesType);
+//     // Criação do grafo de teste com 10 vértices
+//     GraphAdjList grafo(10);
+//     grafo.addEdge(0, 1, "BairroA", 10, 50, false, 1, lotesType);
+//     grafo.addEdge(1, 2, "BairroA", 20, 40, false, 1, lotesType);
+//     grafo.addEdge(2, 3, "BairroA", 15, 45, false, 1, lotesType);
+//     grafo.addEdge(3, 4, "BairroA", 20, 35, false, 1, lotesType);
+//     grafo.addEdge(1, 3, "BairroA", 5, 35, false, 1, lotesType);
+//     grafo.addEdge(0, 4, "BairroA", 10, 35, false, 1, lotesType);
+//     grafo.addEdge(4, 5, "BairroA", 30, 40, false, 1, lotesType);
+//     grafo.addEdge(9, 0, "BairroB", 25, 45, false, 1, lotesType);
+//     grafo.addEdge(5, 6, "BairroB", 10, 60, false, 1, lotesType);
+//     grafo.addEdge(6, 7, "BairroB", 25, 55, false, 1, lotesType);
+//     grafo.addEdge(6, 9, "BairroB", 25, 55, false, 1, lotesType);
+//     grafo.addEdge(7, 8, "BairroB", 35, 50, false, 1, lotesType);
+//     grafo.addEdge(8, 9, "BairroB", 40, 45, false, 1, lotesType);
 
-    // Selecione as arestas mínimas por bairro
-    auto arestasMinimas = selecionarArestasMinimasPorBairro(grafo);
-    cout << "Arestas mínimas por bairro (apenas vértices):\n";
-    for (const auto& bairro : arestasMinimas) {
-        vertex u = bairro.second.first;
-        vertex v = bairro.second.second;
-        cout << "Origem: " << u << " | Destino: " << v << endl;
-    }
-    // Encontra o ciclo para a rota de onibus
-    auto ciclo = encontrarCicloArestasMinimas(grafo, arestasMinimas);
-    cout << "Ciclo passando pelas arestas mínimas:\n";
-    for (vertex v : ciclo) {
-        cout << v << " ";
-    }
-    cout << endl;
+//     // // Selecione as arestas mínimas por bairro
+//     // auto arestasMinimas = selecionarArestasMinimasPorBairro(grafo);
+//     // cout << "Arestas mínimas por bairro (apenas vértices):\n";
+//     // for (const auto& bairro : arestasMinimas) {
+//     //     vertex u = bairro.second.first;
+//     //     vertex v = bairro.second.second;
+//     //     cout << "Origem: " << u << " | Destino: " << v << endl;
+//     // }
+//     // // Encontra o ciclo para a rota de onibus
+//     // auto ciclo = encontrarCicloArestasMinimas(grafo, arestasMinimas);
+//     // cout << "Ciclo passando pelas arestas mínimas:\n";
+//     // for (vertex v : ciclo) {
+//     //     cout << v << " ";
+//     // }
+//     // cout << endl;
 
-    testarDesempenho();
-    return 0;
-}
+//     testarDesempenho();
+//     return 0;
+// }

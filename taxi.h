@@ -11,6 +11,8 @@ using namespace std;
 
 const float TAXA_TAXI = 4.0f;
 const float CUSTO_MIN_TAXI = 9.0f;
+const int A_PE_CODE = 0;
+const int TAXI_CODE = 1;
 
 float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parentTaxi);
 float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* parentCaminhada);

@@ -113,14 +113,14 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
         // Se conseguir chegar no destino só de taxi acaba
         if (parada == destino){
             float tempo = calculaTempoTaxi(graphDirecionado, origem, destino, parentTaxi);
-            rota.append(1, tempo, &caminhoTaxi);
+            rota.append(TAXI_CODE, tempo, &caminhoTaxi);
             return tempo;
         }
         
         // Calcula tempo da viagem de taxi
         if (insertOnList){
             tempoTaxi  = calculaTempoTaxi(graphDirecionado, origem, parada, parentTaxi);
-            rota.append(1, tempoTaxi, &caminhoTaxi); // adicionamos o caminho do taxi na rota
+            rota.append(TAXI_CODE, tempoTaxi, &caminhoTaxi); // adicionamos o caminho do taxi na rota
         }
     }
     // Dijkstra do vértice final do caminho do taxi até o dentino final
@@ -138,7 +138,7 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
     caminhoCaminhada.insert_front(vertice);
 
     float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, parada, destino, parentCaminhada);
-    rota.append(0, tempoCaminhada, &caminhoCaminhada);
+    rota.append(A_PE_CODE, tempoCaminhada, &caminhoCaminhada);
 
     return tempoTaxi + tempoCaminhada;
 }
