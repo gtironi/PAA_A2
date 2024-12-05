@@ -167,3 +167,4 @@ cython_debug/
 .venv/
 cache/
 ignorar/
+settings.json

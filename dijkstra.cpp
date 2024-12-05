@@ -20,12 +20,12 @@ void Dijkstra::compute(GraphAdjList& graph, int start, int* parent, int* distanc
         int v1 = heap.extract_min();
         heap.pop();
         if (distance[v1] == INT_MAX) break;
-        
+
         EdgeNode* edge = graph.getEdges(v1);
         while (edge) {
             int v2 = edge->otherVertex();
             if (!checked[v2]) {
-                int cost = edge->cost();
+                int cost = edge->length();
                 if (distance[v1] + cost < distance[v2]) {
                     parent[v2] = v1;
                     distance[v2] = distance[v1] + cost;
