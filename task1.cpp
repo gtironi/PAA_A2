@@ -87,13 +87,21 @@ GraphAdjList buildStationSubgraph(GraphAdjList& graph, const vector<vertex>& sta
     int parent[graph.numVertices()];
     int distance[graph.numVertices()];
 
-    for (int i = 0; i < numStations; i++) {
+    int lotesType[4] = {};
+
+    for (int i = 0; i < numStations; i++) { 
         Dijkstra::compute(graph, stations[i], parent, distance);
 
         for (int j = i + 1; j < numStations; j++) {
+            cout << "Station: " << j << " is " << stations[j] << endl;
+            if (stations[j] >= graph.numVertices()) {
+                continue;
+            }
+
             int cost = distance[stations[j]];
+            cout << "The cost is: " << cost << endl;
             if (cost < INT_MAX) {
-                subgraph.addEdge(i, j, "Subgraph", cost, 0, false);
+                subgraph.addEdge(i, j, "Subgraph", cost, 0, false, 0, lotesType);
             }
         }
     }
@@ -109,6 +117,10 @@ int minimumCostToConnectStations(GraphAdjList& graph, const vector<vertex>& stat
     int numStations = stations.size();
     int parent[numStations];
     Prim::mst(subgraph, parent);
+
+    // PRINT MST
+    //cout << "Minimum Spanning Tree:" << endl;
+    //subgraph.print();
 
     // Calcular o custo total da MST
     int totalCost = 0;

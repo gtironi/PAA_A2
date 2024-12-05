@@ -68,19 +68,21 @@ void testPrim() {
 }
 
 int testTask1() {
-    // Criar o grafo (exemplo)
     GraphAdjList graph(10);
-    graph.addEdge(0, 1, "Centro", 10, 50, false);
-    graph.addEdge(1, 2, "Centro", 15, 50, false);
-    graph.addEdge(2, 3, "Zona Sul", 12, 50, false);
-    graph.addEdge(3, 4, "Zona Sul", 8, 50, false);
-    graph.addEdge(3, 5, "Zona Sul", 20, 50, false);
-    graph.addEdge(4, 5, "Zona Sul", 8, 50, false);
-    graph.addEdge(5, 6, "Zona Sul", 22, 50, false);
-    graph.addEdge(0, 6, "Barra", 25, 50, false);
-    graph.addEdge(0, 7, "Barra", 30, 50, false);
-    graph.addEdge(7, 6, "Barra", 35, 50, false);
-    graph.addEdge(7, 5, "Barra", 40, 50, false);
+
+    int lotesType[4] = {1, 0, 0, 0};
+
+    graph.addEdge(0, 1, "Centro", 10, 50, false, 1, lotesType);
+    graph.addEdge(1, 2, "Centro", 15, 50, false, 1, lotesType);
+    graph.addEdge(2, 3, "Zona Sul", 12, 50, false, 1, lotesType);
+    graph.addEdge(3, 4, "Zona Sul", 8, 50, false, 1, lotesType);
+    graph.addEdge(3, 5, "Zona Sul", 20, 50, false, 1, lotesType);
+    graph.addEdge(4, 5, "Zona Sul", 8, 50, false, 1, lotesType);
+    graph.addEdge(5, 6, "Zona Sul", 22, 50, false, 1, lotesType);
+    graph.addEdge(0, 6, "Barra", 25, 50, false, 1, lotesType);
+    graph.addEdge(0, 7, "Barra", 30, 50, false, 1, lotesType);
+    graph.addEdge(7, 6, "Barra", 35, 50, false, 1, lotesType);
+    graph.addEdge(7, 5, "Barra", 40, 50, false, 1, lotesType);
 
     // Gerar regiões
     vector<vector<vertex>> regions = generateRegions(graph);
@@ -95,7 +97,7 @@ int testTask1() {
 
     // Conectando estações - construir MST
     int totalCost = minimumCostToConnectStations(graph, stations);
-    std::cout << totalCost << endl;
+    cout << "Custo total para conectar estações: " << totalCost << endl;
 
     return 0;
 }
@@ -131,6 +133,6 @@ int main() {
     testDijkstra();
     testPrim();
     testTask1();
-    testCoeficiente();
+    //testCoeficiente();
     return 0;
 }

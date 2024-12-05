@@ -15,7 +15,7 @@ void initialize(GraphAdjList& graph, int* parent, bool* inTree, int* vertexCost)
     while (edge) {
         int v2 = edge->otherVertex();
         parent[v2] = 0;
-        vertexCost[v2] = edge->length();
+        vertexCost[v2] = edge->cost();
         edge = edge->next();
     }
 }
@@ -42,7 +42,7 @@ void Prim::mst(GraphAdjList& graph, int* parent) {
         EdgeNode* edge = graph.getEdges(v1);
         while (edge) {
             int v2 = edge->otherVertex();
-            int cost = edge->length();
+            int cost = edge->cost();
             if (!inTree[v2] && cost < vertexCost[v2]) {
                 vertexCost[v2] = cost;
                 parent[v2] = v1;
