@@ -68,21 +68,20 @@ void testPrim() {
 }
 
 int testTask1() {
-    GraphAdjList graph(10);
+    GraphAdjList graph(7);
 
     int lotesType[4] = {1, 0, 0, 0};
 
-    graph.addEdge(0, 1, "Centro", 10, 50, false, 1, lotesType);
-    graph.addEdge(1, 2, "Centro", 15, 50, false, 1, lotesType);
-    graph.addEdge(2, 3, "Zona Sul", 12, 50, false, 1, lotesType);
-    graph.addEdge(3, 4, "Zona Sul", 8, 50, false, 1, lotesType);
-    graph.addEdge(3, 5, "Zona Sul", 20, 50, false, 1, lotesType);
-    graph.addEdge(4, 5, "Zona Sul", 8, 50, false, 1, lotesType);
-    graph.addEdge(5, 6, "Zona Sul", 22, 50, false, 1, lotesType);
-    graph.addEdge(0, 6, "Barra", 25, 50, false, 1, lotesType);
-    graph.addEdge(0, 7, "Barra", 30, 50, false, 1, lotesType);
-    graph.addEdge(7, 6, "Barra", 35, 50, false, 1, lotesType);
-    graph.addEdge(7, 5, "Barra", 40, 50, false, 1, lotesType);
+    graph.addEdge(0, 1, "Centro", 5, 50, false, 1, lotesType);
+    graph.addEdge(1, 2, "Centro", 7, 50, false, 1, lotesType);
+    graph.addEdge(2, 3, "Zona Sul", 6, 50, false, 1, lotesType);
+    graph.addEdge(3, 4, "Zona Sul", 4, 50, false, 1, lotesType);
+    graph.addEdge(3, 5, "Zona Sul", 5, 50, false, 1, lotesType);
+    graph.addEdge(4, 5, "Zona Sul", 4, 50, false, 1, lotesType);
+    graph.addEdge(5, 6, "Zona Sul", 11, 50, false, 1, lotesType);
+
+    // Stations = 1, 5
+    // MST = 1 -> 2 -> 3 -> 5
 
     // Gerar regiões
     vector<vector<vertex>> regions = generateRegions(graph);
@@ -130,8 +129,8 @@ void testCoeficiente() {
 }
 
 int main() {
-    testDijkstra();
-    testPrim();
+    //testDijkstra();
+    //testPrim();
     testTask1();
     //testCoeficiente();
     return 0;
