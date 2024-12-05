@@ -1,5 +1,4 @@
 #include "prim.h"
-#include <climits> // Para INT_MAX
 
 void initialize(GraphAdjList& graph, int* parent, bool* inTree, int* vertexCost) {
     int numVertices = graph.numVertices();

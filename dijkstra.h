@@ -1,8 +1,9 @@
 #ifndef DIJKSTRA_H
 #define DIJKSTRA_H
 
-#include "graph.h" 
-#include "heap.h"  
+#include "graph.h"
+#include "heap.h"
+#include <climits> // Para INT_MAX
 
 class Dijkstra {
 public:

@@ -4,6 +4,8 @@
 #include "graph.h"
 #include "heap.h"
 
+#include <climits> // Para INT_MAX
+
 class Prim {
 public:
     static void mst(GraphAdjList& graph, int* parent);

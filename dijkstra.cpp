@@ -1,5 +1,4 @@
 #include "dijkstra.h"
-#include <climits> // Para INT_MAX
 
 void Dijkstra::compute(GraphAdjList& graph, int start, int* parent, int* distance) {
     int numVertices = graph.numVertices();

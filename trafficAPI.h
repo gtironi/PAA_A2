@@ -4,9 +4,9 @@
 #include <cstdlib>
 #include <cmath>
 
-using namespace std;
-
 #include "graph.h"
+
+using namespace std;
 
 class EdgeNode; // Forward declaration para evitar dependências circulares
 
