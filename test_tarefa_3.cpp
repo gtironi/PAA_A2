@@ -4,46 +4,9 @@
 
 #include "graph.h"
 #include "metro.h"
+#include "taxi.h"
 
-void testMetro() {
-    int stdSizeEdge = 100;
-    int stdMaxSpeed = 60;
-    bool oneWay = true;
-    
-    // Grafo de táxi pra teste
-    GraphAdjList graphTaxi(13);
-    // Adiciona arestas
-    graphTaxi.addEdge(0, 1, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(0, 2, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphTaxi.addEdge(10, 12, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
-    graphTaxi.addEdge(11, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-
-    // Grafo de metro pra teste
-    GraphAdjList graphMetro(13);
-    // Copiando aresta dos vértices 4 a 9
-    graphMetro.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
-
-    GraphAdjList* graphMetroBidirectional = graphMetro.createBidirectionalCopy();
-
+void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional) {
     //======================================================================
     // Testando funções de metrô
 
@@ -56,7 +19,7 @@ void testMetro() {
     expectedPathMetro.insert_front(3);
     
     // Criação do caminho no formato de lista
-    IntList* pathMetro = createPathMetro(*graphMetroBidirectional, 3, 10);
+    IntList* pathMetro = createPathMetro(graphMetroBidirectional, 3, 10);
 
     // Começo das duas listas
     IntNode* currentVertex = pathMetro->head;
@@ -79,7 +42,7 @@ void testMetro() {
     float expectedValueTime = float(40.0/7.0);
 
     // Calculando tempo gasto no caminho
-    float timeTakenMetro = timeMetro(*graphMetroBidirectional, *pathMetro, metroSpeed);
+    float timeTakenMetro = timeMetro(graphMetroBidirectional, *pathMetro, metroSpeed);
 
     // Verificando resultado
     assert(timeTakenMetro == expectedValueTime);
@@ -93,10 +56,10 @@ void testMetro() {
     vertex expectedVertexNotInGraph = 0;
 
     // Verificando resultados;
-    assert(vertexInGraphMetro(expectedVertexInGraph1, *graphMetroBidirectional));
-    assert(vertexInGraphMetro(expectedVertexInGraph2, *graphMetroBidirectional));
-    assert(vertexInGraphMetro(expectedVertexInGraph3, *graphMetroBidirectional));
-    assert(!vertexInGraphMetro(expectedVertexNotInGraph, *graphMetroBidirectional));
+    assert(vertexInGraphMetro(expectedVertexInGraph1, graphMetroBidirectional));
+    assert(vertexInGraphMetro(expectedVertexInGraph2, graphMetroBidirectional));
+    assert(vertexInGraphMetro(expectedVertexInGraph3, graphMetroBidirectional));
+    assert(!vertexInGraphMetro(expectedVertexNotInGraph, graphMetroBidirectional));
 
     cout << "Teste do pertencimento passou!" << endl;
 
@@ -106,7 +69,7 @@ void testMetro() {
     vertex expectedStation = 3;
 
     // Rodando função
-    vertex closestStation = closestMetroStation(1, graphTaxi, *graphMetroBidirectional);
+    vertex closestStation = closestMetroStation(1, graphStreets, graphMetroBidirectional);
 
     // Verificando resultado
     assert(expectedStation == closestStation);
@@ -116,7 +79,7 @@ void testMetro() {
     expectedStation = 10;
 
     // Rodando função
-    closestStation = closestMetroStation(11, graphTaxi, *graphMetroBidirectional);
+    closestStation = closestMetroStation(11, graphStreets, graphMetroBidirectional);
 
     // Verificando resultado
     assert(expectedStation == closestStation);
@@ -125,7 +88,54 @@ void testMetro() {
 }
 
 int main() {
-    testMetro();
+    int stdSizeEdge = 100;
+    int stdMaxSpeed = 60;
+    bool oneWay = true;
+    
+    // Grafo de táxi pra teste
+    GraphAdjList graphStreets(13);
+    // Adiciona arestas
+    graphStreets.addEdge(0, 1, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
+    graphStreets.addEdge(0, 2, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
+    graphStreets.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
+    graphStreets.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(9, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphStreets.addEdge(10, 12, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay);
+    graphStreets.addEdge(11, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+
+    // Grafo de metro pra teste
+    GraphAdjList graphMetro(13);
+    // Copiando aresta dos vértices 4 a 9
+    graphMetro.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(8, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+    graphMetro.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay);
+
+    GraphAdjList* graphStreetsBidirectional = graphStreets.createBidirectionalCopy();
+    GraphAdjList* graphMetroBidirectional = graphMetro.createBidirectionalCopy();
+    
+    testMetro(graphStreets, *graphMetroBidirectional);
+
+    vertex closestStation = closestMetroStation(0, graphStreets, graphMetro);
+
+    NodeList rota;
+    rotaTaxi(*graphStreetsBidirectional, graphStreets, rota, 0, closestStation, 100);
+
+    cout << "Rota até a estação: " << endl;
+    rota.print();
 
     return 0;
 }
