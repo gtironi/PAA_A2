@@ -115,7 +115,6 @@ std::vector<vertex> encontrarCicloArestasMinimas(GraphAdjList& subgrafo, const s
     return ciclo;
 }
 
-
 void testarDesempenho() {
     vector<int> tamanhos = {1000, 2000, 4000, 40000}; // Tamanhos dos grafos para teste
     vector<double> tempos; // Armazena os tempos de execução
@@ -152,6 +151,74 @@ void testarDesempenho() {
         dataFile << tamanhos[i] << " " << tempos[i] << endl;
     }
     dataFile.close();
+}
+
+float rotaOnibus(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, std::vector<vertex> linhaOnibus, NodeList& rota, int origem, int destino, float custoMax) {
+    // Custo do ônibus
+    const float CUSTO_ONIBUS = 4.50;
+
+    // Verificar se o custo disponível é suficiente para pegar um ônibus
+    if (custoMax < CUSTO_ONIBUS) {
+        return std::numeric_limits<float>::max();
+    }
+
+    // Reduzir o custo máximo pelo valor do ônibus
+    custoMax -= CUSTO_ONIBUS;
+
+    // Encontrar vértices mais próximos na linha de ônibus
+    Dijkstra dijkstra;
+    int parentOrigem[graphCompleto.numVertices()];
+    int distanceOrigem[graphCompleto.numVertices()];
+    dijkstra.compute(graphCompleto, origem, parentOrigem, distanceOrigem);
+
+    int parentDestino[graphCompleto.numVertices()];
+    int distanceDestino[graphCompleto.numVertices()];
+    dijkstra.compute(graphCompleto, destino, parentDestino, distanceDestino);
+
+    vertex embarque = -1;
+    vertex desembarque = -1;
+    int menorDistOrigem = std::numeric_limits<int>::max();
+    int menorDistDestino = std::numeric_limits<int>::max();
+
+    // Determinar o vértice mais próximo na linha de ônibus para embarcar e desembarcar
+    int idx_embarque;
+    int idx_desembarque;
+    for (int i=0; i<linhaOnibus.size();i++) {
+        int v = linhaOnibus[i];
+        if (distanceOrigem[v] < menorDistOrigem) {
+            menorDistOrigem = distanceOrigem[v];
+            embarque = v;
+            int idx_embarque = i;
+        }
+        if (distanceDestino[v] < menorDistDestino) {
+            menorDistDestino = distanceDestino[v];
+            desembarque = v;
+            int idx_desembarque = i;
+        }
+    }
+
+    // Se não encontrou vértices viáveis na linha de ônibus
+    if (embarque == -1 || desembarque == -1) {
+        return std::numeric_limits<float>::max();
+    }
+
+    IntList caminhoOnibus;
+    bool continua = true;
+    int i=idx_embarque;
+    while (i!=idx_desembarque) {
+        caminhoOnibus.append(i);
+        i++;
+        if (i==linhaOnibus.size()){i=0;}
+    }
+    caminhoOnibus.append(i);
+    
+    float tempoIda = rotaTaxi(graphCompleto, graphDirecionado, rota, origem, embarque, custoMax, custoMax);
+    float tempoOnibus = calculaTempoTaxi(graphDirecionado, embarque, desembarque, caminhoOnibus);
+    rota.append(0, tempoOnibus, &caminhoOnibus);
+    float tempoSaida = rotaTaxi(graphCompleto, graphDirecionado, rota, desembarque, destino, custoMax, custoMax);
+    
+
+    return tempoIda + tempoOnibus + tempoSaida;
 }
 
 int main() {
