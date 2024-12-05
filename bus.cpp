@@ -30,7 +30,7 @@ unordered_map<std::string, std::pair<vertex, vertex>> selecionarArestasMinimasPo
         while (aresta) {
             vertex v = aresta->otherVertex();
             std::string bairro = aresta->bairro();
-            int custo = aresta->cost();
+            int custo = aresta->coefficient_lotes();
             // Se o bairro ainda não foi encontrado ou a aresta atual tem custo menor
             if (arestasMinimasPorBairro.find(bairro) == arestasMinimasPorBairro.end() || custo < custosMinimosPorBairro[bairro]) {
                 // Atualiza a aresta e o custo mínimo
@@ -80,7 +80,7 @@ std::vector<vertex> encontrarCicloArestasMinimas(GraphAdjList& subgrafo, const s
             int* parent = new int[subgrafo.numVertices()];
             int* distance = new int[subgrafo.numVertices()];
             // Encontra o menor caminho entre os vertices
-            Dijkstra::compute(subgrafo, u, parent, distance);
+            Dijkstra2::compute(subgrafo, u, parent, distance);
             caminho = reconstruirCaminho(u, v, std::vector<vertex>(parent, parent + subgrafo.numVertices()));
             // Adiciona o caminho ao ciclo
             for (size_t j = 1; j < caminho.size(); ++j) {
@@ -102,7 +102,7 @@ std::vector<vertex> encontrarCicloArestasMinimas(GraphAdjList& subgrafo, const s
         int* parent = new int[subgrafo.numVertices()];
         int* distance = new int[subgrafo.numVertices()];
         // Encontra o menor caminho
-        Dijkstra::compute(subgrafo, u, parent, distance);
+        Dijkstra2::compute(subgrafo, u, parent, distance);
         caminho = reconstruirCaminho(u, v, std::vector<vertex>(parent, parent + subgrafo.numVertices()));
         for (size_t j = 1; j < caminho.size(); ++j) {
             if (std::find(ciclo.begin(), ciclo.end(), caminho[j]) == ciclo.end()) {

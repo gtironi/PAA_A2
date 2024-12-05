@@ -10,4 +10,9 @@ public:
     static void compute(GraphAdjList& graph, int start, int* parent, int* distance);
 };
 
+class Dijkstra2 {
+public:
+    static void compute(GraphAdjList& graph, int start, int* parent, int* distance);
+};
+
 #endif // DIJKSTRA_H
