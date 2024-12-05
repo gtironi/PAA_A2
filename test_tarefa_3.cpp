@@ -129,10 +129,16 @@ int main() {
     
     testMetro(graphStreets, *graphMetroBidirectional);
 
+    // Testes de táxi
+    // Origem
+    vertex start = 0;
+    // Estação que queremos chegar
     vertex closestStation = closestMetroStation(0, graphStreets, graphMetro);
+    // Orçamento
+    int budget = 100;
 
     NodeList rota;
-    rotaTaxi(*graphStreetsBidirectional, graphStreets, rota, 0, closestStation, 100);
+    rotaTaxi(*graphStreetsBidirectional, graphStreets, rota, start, closestStation, budget);
 
     cout << "Rota até a estação: " << endl;
     rota.print();

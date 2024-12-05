@@ -149,17 +149,19 @@ float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, Node
     int distanceCaminhada[graphCompleto.numVertices()];
     dijkstra.compute(graphCompleto, graphCompleto.numVertices()-1, parentCaminhada, distanceCaminhada);
 
-    vertice = destino;
-    IntList caminhoCaminhada;
+    // vertice = destino;
+    cout << "Calculando caminho" << endl;
+    IntList* caminhoCaminhada = pathVertices(origem, destino, parentCaminhada);
+
     // Loop para achar o caminho que será feito a pé
-    while (vertice != parentCaminhada[vertice]){
-        caminhoCaminhada.insert_front(vertice);
-        vertice = parentCaminhada[vertice];
-    }
-    caminhoCaminhada.insert_front(vertice);
+    // while (vertice != parentCaminhada[vertice]){
+    //     caminhoCaminhada.insert_front(vertice);
+    //     vertice = parentCaminhada[vertice];
+    // }
+    // caminhoCaminhada.insert_front(vertice);
 
     float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, graphCompleto.numVertices()-1, destino, parentCaminhada);
-    rota.append(0, tempoCaminhada, &caminhoCaminhada);
+    rota.append(0, tempoCaminhada, caminhoCaminhada);
 
     return tempoTaxi + tempoCaminhada;
 }

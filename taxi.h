@@ -5,6 +5,7 @@
 #include "graph.h"
 #include "dijkstra.h"
 #include "list.h"
+#include "metro.h"
 
 using namespace std;
 
