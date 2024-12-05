@@ -1,5 +1,5 @@
-#include "graph.h";
-#include "utils.h";
+#include "graph.h"
+#include "utils.h"
 
 // Recebe vértices de origem, destino, vetor de país gerado por uma função
 // de caminho e o comprimento do caminho e retorna caminho no formato de 

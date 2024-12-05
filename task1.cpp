@@ -72,6 +72,43 @@ vector<vertex> determineStations(GraphAdjList& graph, const vector<vector<vertex
     return stations;
 }
 
+// Função para construir o subgrafo com base nos caminhos mínimos entre as estações
+GraphAdjList buildStationSubgraph(GraphAdjList& graph, const vector<vertex>& stations) {
+    int numStations = stations.size();
+    GraphAdjList subgraph(numStations);
+
+    // Mapear cada estação para o índice no subgrafo
+    unordered_map<vertex, int> stationIndex;
+    for (int i = 0; i < numStations; i++) {
+        stationIndex[stations[i]] = i;
+    }
+
+    // Calcular os menores caminhos entre cada par de estações
+    int parent[graph.numVertices()];
+    int distance[graph.numVertices()];
+
+    int lotesType[4] = {};
+
+    for (int i = 0; i < numStations; i++) { 
+        Dijkstra::compute(graph, stations[i], parent, distance);
+
+        for (int j = i + 1; j < numStations; j++) {
+            cout << "Station: " << j << " is " << stations[j] << endl;
+            if (stations[j] >= graph.numVertices()) {
+                continue;
+            }
+
+            int cost = distance[stations[j]];
+            cout << "The cost is: " << cost << endl;
+            if (cost < INT_MAX) {
+                subgraph.addEdge(i, j, "Subgraph", cost, 0, false, 0, lotesType);
+            }
+        }
+    }
+
+    return subgraph;
+}
+
 //Função para calcular o custo mínimo para conectar todas as estações
 int minimumCostToConnectStations(GraphAdjList& graph, const vector<vertex>& stations) {
     int n = stations.size();
