@@ -13,7 +13,7 @@
 #include "dijkstra.h"
 #include "prim.h"
 #include "list.h"
-#include "bus.h"
+// #include "bus.h"
 #include "taxi.h"
 
 using namespace std;
@@ -23,18 +23,20 @@ void melhorRota(GraphAdjList& graph, int origem, int destino, int custoMax) {
     NodeList rota;
     GraphAdjList* graphCompleto = graph.createBidirectionalCopy();
     GraphAdjList* graphDirecionado = graph.clone();
-    
+    float resto = 0;
     // Selecione as arestas mínimas por bairro
-    auto arestasMinimas = selecionarArestasMinimasPorBairro(grafo);
-    
+    // auto arestasMinimas = selecionarArestasMinimasPorBairro(graph);
     // Encontra o ciclo para a rota de onibus
-    auto ciclo = encontrarCicloArestasMinimas(grafo, arestasMinimas);
+    // auto ciclo = encontrarCicloArestasMinimas(graph, arestasMinimas);
 
-
-    float tempoTaxi = rotaTaxi(*graphCompleto, *graphDirecionado, rota, origem, destino, custoMax);
+    float tempoTaxi = rotaTaxi(*graphCompleto, *graphDirecionado, rota, origem, destino, custoMax, resto);
+    cout << "ROTA SOMENTE COM TAXI:" << endl;
     rota.print();
-    float tempoOnibus = rotaOnibus(graph, rota, custoMax);
-
+    rota.clear();
+    // float tempoOnibus = rotaOnibus(*graphCompleto, *graphDirecionado, ciclo, rota, origem, destino, custoMax);
+    // cout << "ROTA COM ÔNIBUS:" << endl;
+    // rota.print();
+    // rota.clear();
     return;
 }
 
@@ -68,7 +70,7 @@ int main() {
     graph.addEdge(11, 10, "Bairro3", stdSizeEdge, stdMaxSpeed, oneWay, numLotes, lotesType);
 
     // defina aqui os vértices de origem e destino e o custo máximo, respectivamente
-    melhorRota(graphTaxi, 0, 3, 100000); // a função irá printar o melhor caminho e o tempo gasto
+    melhorRota(graph, 0, 3, 100000); // a função irá printar o melhor caminho e o tempo gasto
 
     return 0;
 }

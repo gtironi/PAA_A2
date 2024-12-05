@@ -12,9 +12,9 @@ using namespace std;
 const float TAXA_TAXI = 4.0f;
 const float CUSTO_MIN_TAXI = 9.0f;
 
-float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int filho, int distRestante, int* parentTaxi);
+float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parentTaxi);
 float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* parentCaminhada);
-float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax);
+float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax, float&);
 // void melhorRota(GraphAdjList& graph, int origem, int destino, int custoMax);
 
 #endif // TAXI_H

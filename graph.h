@@ -51,6 +51,9 @@ public:
     void addEdge(vertex v1, vertex v2, const string& bairro, int length, int maxSpeed, bool oneway, int numLotes, int lotesType[4]);
     void removeEdge(vertex v1, vertex v2);
     void print();
+    void splitEdge(vertex vi, vertex vj, int distRestante);
+    GraphAdjList* createBidirectionalCopy() const;
+    GraphAdjList* clone() const;
 
     int numBairros() const {
         return m_numBairros;
