@@ -2,7 +2,7 @@
 #include "bus_v2.h"
 
 int main() {
-    const std::string filename = "graphs_regions/grafo_barcelona_adjacencia.csv";
+    const std::string filename = "graphs_regions/grafo_berlim_adjacencia.csv";
 
     vector<vertex> BestPath = loadAndProcessGraph(filename);
 

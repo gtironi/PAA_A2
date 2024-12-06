@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 
 using namespace std;
 
@@ -131,10 +132,19 @@ vector<vertex> loadAndProcessGraph(const string& filename) {
     GraphAdjList grafo(maxVertex + 1);
     loadGraphFromCSV(filename, grafo);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     vector<int> minLotesVertices, vertexIndices;
     findMinCoefficientVertices(grafo, minLotesVertices, vertexIndices);
 
     vector<vertex> BestPath = findBusPath(grafo, vertexIndices);
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> duration = end - start;
+
+    std::cout << "Tempo de execução: " << duration.count() << " segundos" << " para " << filename << std::endl;
+    std::cout << "O grafo contem " << grafo.numVertices() << " vértices e " << grafo.numEdges() << " arestas e " << grafo.numBairros() << " bairros." << std::endl;
 
     return BestPath;
 }
