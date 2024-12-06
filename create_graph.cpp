@@ -113,27 +113,27 @@ void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
     file.close();
 }
 
-int main() {
-    const std::string filename = "data.csv";
+// int main() {
+//     const std::string filename = "data.csv";
 
-    // Determina o maior índice de vértice no arquivo CSV
-    int maxVertex = getMaxVertex(filename);
-    if (maxVertex == -1) {
-        return 1; // Erro ao abrir o arquivo
-    }
+//     // Determina o maior índice de vértice no arquivo CSV
+//     int maxVertex = getMaxVertex(filename);
+//     if (maxVertex == -1) {
+//         return 1; // Erro ao abrir o arquivo
+//     }
 
-    GraphAdjList graph(maxVertex + 1); // Cria o grafo com base no maior índice de vértice
+//     GraphAdjList graph(maxVertex + 1); // Cria o grafo com base no maior índice de vértice
 
-    // Carrega o grafo a partir do arquivo CSV
-    loadGraphFromCSV(filename, graph);
+//     // Carrega o grafo a partir do arquivo CSV
+//     loadGraphFromCSV(filename, graph);
 
-    TrafficAPI trafficAPI;
+//     TrafficAPI trafficAPI;
 
-    // Atualiza os multiplicadores de tráfego
-    trafficAPI.updateTraffic(graph);
+//     // Atualiza os multiplicadores de tráfego
+//     trafficAPI.updateTraffic(graph);
 
-    // Exibe o grafo
-    graph.print();
+//     // Exibe o grafo
+//     graph.print();
 
-    return 0;
-}
+//     return 0;
+// }

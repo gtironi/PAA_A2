@@ -3,7 +3,7 @@
 float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parentTaxi) {
     float tempo = 0.0f;
     int v_max;
-    int cost;
+    float cost;
     float modf_transito;
     int vertice = destino;
 
@@ -15,7 +15,7 @@ float calculaTempoTaxi(GraphAdjList& graph, int origem, int destino, int* parent
         while (edge) {
             int v2 = edge->otherVertex();
             if (v2 == vertice) {
-                cost = edge->length();
+                cost = (float)(edge->length())/1000;
                 v_max = edge->maxSpeed();
                 modf_transito = edge->traffic_multiplier;
                 tempo += cost / (v_max * modf_transito);
@@ -51,7 +51,7 @@ float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* p
         while (edge) {
             int v2 = edge->otherVertex();
             if (v2 == vertice) {
-                int cost = edge->length();
+                float cost = (float)(edge->length())/1000;
                 tempo += cost / 5;
                 encontrou = true;
                 break;
@@ -72,72 +72,101 @@ float calculaTempoCaminhada(GraphAdjList& graph, int origem, int destino, int* p
     return tempo;
 }
 
-float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax, float& dinheiroRestante){    
+float rotaTaxi(GraphAdjList& graphCompleto, GraphAdjList& graphDirecionado, NodeList& rota, int origem, int destino, int custoMax, float& dinheiroRestante) {    
     // Distância máxima que da para andar de taxi com o custo
-    int distMax = (int)(custoMax/TAXA_TAXI);//taxa taxi
+    float distMax = (float)((custoMax) / TAXA_TAXI);  // taxa taxi
     int vertice = destino;
     int parada = origem;
     Dijkstra dijkstra;
-    float tempoTaxi =0;
+    float tempoTaxi = 0;
     dinheiroRestante = 0;
-    // se dist_max<CUSTO_MIN_TAXI/TAXA_TAXI quer dizer que o usuário não tem dinheiro para andar de taxi
-    if (distMax >= CUSTO_MIN_TAXI/TAXA_TAXI){
+    
+    // Se dist_max < CUSTO_MIN_TAXI/TAXA_TAXI quer dizer que o usuário não tem dinheiro para andar de taxi
+    if (distMax >= CUSTO_MIN_TAXI / TAXA_TAXI) {
         // Inicializando vetores
         int distanceTaxi[graphDirecionado.numVertices()];
         int parentTaxi[graphDirecionado.numVertices()];
+        
         // Dijkstra para achar o menor caminho de taxi até o endereço
         dijkstra.compute(graphDirecionado, origem, parentTaxi, distanceTaxi);
         
-        int dist = 0;
-        int finalRua;
+        float dist = 0;
         bool insertOnList = false;
         IntList caminhoTaxi;
+        
+        // Verifica se o Dijkstra encontrou um caminho
+        if (parentTaxi[destino] == -1) {
+            std::cerr << "Erro: Dijkstra não encontrou caminho até o destino." << std::endl;
+            return -1;
+        }
+
         // Loop para achar o vértice mais longe que da pra ir de taxi
-        while (vertice != parentTaxi[vertice]){
-            if (!insertOnList){
-                dist = distanceTaxi[vertice];
-                if (dist < distMax){
+        while (vertice != parentTaxi[vertice]) {
+            if (!insertOnList) {
+                dist = (distanceTaxi[vertice])/1000;
+                if (dist < distMax) {
                     caminhoTaxi.insert_front(vertice);
                     parada = vertice;
                     insertOnList = true;
-                } // no momento que acha um vértice que da para chegar de taxi quebra
-            } else{
+                }
+            } else {
                 caminhoTaxi.insert_front(vertice);
             }
             vertice = parentTaxi[vertice];
-        }
-        caminhoTaxi.insert_front(vertice);
 
-        dinheiroRestante = (distMax - distanceTaxi[parada])*TAXA_TAXI;
+            // Verifica se vertice não está fora do limite
+            if (vertice < 0 || vertice >= graphDirecionado.numVertices()) {
+                std::cerr << "Erro: vertice fora dos limites ao acessar parentTaxi." << std::endl;
+                return -1;
+            }
+        }
         
-        // Se conseguir chegar no destino só de taxi acaba
-        if (parada == destino){
+        caminhoTaxi.insert_front(vertice);
+        dinheiroRestante = (distMax - (distanceTaxi[parada]/1000)) * TAXA_TAXI;
+        
+        // Se conseguir chegar no destino só de taxi, acaba
+        if (parada == destino) {
             float tempo = calculaTempoTaxi(graphDirecionado, origem, destino, parentTaxi);
             rota.append(TAXI_CODE, tempo, &caminhoTaxi);
             return tempo;
         }
         
         // Calcula tempo da viagem de taxi
-        if (insertOnList){
-            tempoTaxi  = calculaTempoTaxi(graphDirecionado, origem, parada, parentTaxi);
+        if (insertOnList) {
+            tempoTaxi = calculaTempoTaxi(graphDirecionado, origem, parada, parentTaxi);
             rota.append(TAXI_CODE, tempoTaxi, &caminhoTaxi); // adicionamos o caminho do taxi na rota
         }
     }
-    // Dijkstra do vértice final do caminho do taxi até o dentino final
+
+    // Dijkstra do vértice final do caminho do taxi até o destino final
     int parentCaminhada[graphCompleto.numVertices()];
     int distanceCaminhada[graphCompleto.numVertices()];
     dijkstra.compute(graphCompleto, parada, parentCaminhada, distanceCaminhada);
 
     vertice = destino;
     IntList caminhoCaminhada;
+
+    // Verifica se o Dijkstra encontrou um caminho
+    if (parentCaminhada[destino] == -1) {
+        std::cerr << "Erro: Dijkstra não encontrou caminho até o destino a pé." << std::endl;
+        return -1;
+    }
+
     // Loop para achar o caminho que será feito a pé
-    while (vertice != parentCaminhada[vertice]){
+    while (vertice != parentCaminhada[vertice]) {
         caminhoCaminhada.insert_front(vertice);
         vertice = parentCaminhada[vertice];
+
+        // Verifica se vertice não está fora do limite
+        if (vertice < 0 || vertice >= graphCompleto.numVertices()) {
+            std::cerr << "Erro: vertice fora dos limites ao acessar parentCaminhada." << std::endl;
+            return -1;
+        }
     }
+    
     caminhoCaminhada.insert_front(vertice);
 
-    float tempoCaminhada  = calculaTempoCaminhada(graphCompleto, parada, destino, parentCaminhada);
+    float tempoCaminhada = calculaTempoCaminhada(graphCompleto, parada, destino, parentCaminhada);
     rota.append(A_PE_CODE, tempoCaminhada, &caminhoCaminhada);
 
     return tempoTaxi + tempoCaminhada;

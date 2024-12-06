@@ -10,5 +10,6 @@ float getHoraAtual();
 // Calcula a melhor rota entre dois pontos considerando restrições e atualizações de tráfego
 void melhorRota(GraphAdjList& graph, int origem, int destino, int custoMax);
 float calcularFaltante(float numero);
+void printRota(NodeList& rota);
 
 #endif // UTILS_H

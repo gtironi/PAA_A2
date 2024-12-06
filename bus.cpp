@@ -175,7 +175,7 @@ float calculaTempoOnibus(GraphAdjList& graph, IntList& caminhoOnibus) {
         while (edge) {
             int v2 = edge->otherVertex();
             if (v2 == v) {
-                int cost = edge->length();
+                float cost = (float)(edge->length())/1000;
                 int v_max = edge->maxSpeed();
                 float modf_transito = edge->traffic_multiplier;
                 tempo += cost / (v_max * modf_transito);
