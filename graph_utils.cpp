@@ -1,5 +1,4 @@
-#include "graph.h"
-#include "trafficAPI.h"
+#include "graph_utils.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -113,27 +112,13 @@ void loadGraphFromCSV(const std::string& filename, GraphAdjList& graph) {
     file.close();
 }
 
-int main() {
-    const std::string filename = "data.csv";
-
-    // Determina o maior índice de vértice no arquivo CSV
+GraphAdjList LoadGraph(const std::string& filename) {
     int maxVertex = getMaxVertex(filename);
     if (maxVertex == -1) {
-        return 1; // Erro ao abrir o arquivo
+        return GraphAdjList(0);
     }
 
-    GraphAdjList graph(maxVertex + 1); // Cria o grafo com base no maior índice de vértice
-
-    // Carrega o grafo a partir do arquivo CSV
-    loadGraphFromCSV(filename, graph);
-
-    TrafficAPI trafficAPI;
-
-    // Atualiza os multiplicadores de tráfego
-    trafficAPI.updateTraffic(graph);
-
-    // Exibe o grafo
-    graph.print();
-
-    return 0;
+    GraphAdjList grafo(maxVertex + 1);
+    loadGraphFromCSV(filename, grafo);
+    return grafo;
 }
