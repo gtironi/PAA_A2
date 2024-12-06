@@ -288,14 +288,20 @@ Graph primMST(const Graph& graph) {
         return mst;
     }
 
-    // Escolha arbitrária do vértice inicial
-    auto it = graph.getEdges(0);
-    if (it.empty()) {
-        cout << "Não há arestas no grafo.\n";
+    // Escolha do vértice inicial
+    int start = -1;
+    for (int i = 0; i < graph.numVertices(); ++i) {
+        if (!graph.getEdges(i).empty()) {
+            start = i;
+            cout << "Vértice inicial escolhido para a MST: " << start << "\n";
+            break;
+        }
+    }
+    if (start == -1) {
+        cout << "Não há vértices conectados no grafo.\n";
         return mst;
     }
 
-    int start = graph.getEdges(0)[0].from;
     included.insert(start);
 
     // Adicione todas as arestas conectadas ao vértice inicial na fila de prioridade
@@ -307,6 +313,11 @@ Graph primMST(const Graph& graph) {
         auto [weight, vertices] = pq.top();
         pq.pop();
         int from = vertices.first, to = vertices.second;
+
+        // Ignore arestas que levam a vértices já incluídos
+        if (included.find(to) != included.end()) {
+            continue;
+        }
 
         if (included.find(to) == included.end()) {
             // Inclua o vértice 'to' na MST
@@ -359,16 +370,13 @@ int main() {
     int lotesType[4] = {0, 0, 0, 0};
 
     // Adicionando arestas ao grafo
-    graph.addEdge(0, 1, "Centro", 5, 50, false, 1, lotesType);
-    graph.addEdge(1, 2, "Centro", 7, 50, false, 1, lotesType);
-    graph.addEdge(2, 3, "Zona Sul", 6, 50, false, 1, lotesType);
-    graph.addEdge(3, 4, "Zona Sul", 4, 50, false, 1, lotesType);
-    graph.addEdge(3, 5, "Zona Sul", 5, 50, false, 1, lotesType);
-    graph.addEdge(4, 5, "Zona Sul", 4, 50, false, 1, lotesType);
-    graph.addEdge(5, 6, "Zona Sul", 11, 50, false, 1, lotesType);
-    graph.addEdge(6, 7, "Norte", 8, 50, false, 1, lotesType);
-    graph.addEdge(5, 7, "Norte", 9, 50, false, 1, lotesType);
-    graph.addEdge(4, 7, "Norte", 10, 50, false, 1, lotesType);
+    graph.addEdge(0, 1, "Centro", 10, 50, false, 1, lotesType);
+    graph.addEdge(1, 2, "Centro", 15, 50, false, 1, lotesType);
+    graph.addEdge(2, 3, "Zona Sul", 12, 50, false, 1, lotesType);
+    graph.addEdge(3, 4, "Zona Sul", 8, 50, false, 1, lotesType);
+    graph.addEdge(3, 5, "Zona Sul", 20, 50, false, 1, lotesType);
+    graph.addEdge(4, 5, "Zona Sul", 8, 50, false, 1, lotesType);
+    graph.addEdge(5, 6, "Zona Sul", 22, 50, false, 1, lotesType);
 
     // Exibindo o grafo
     graph.print();
@@ -384,13 +392,14 @@ int main() {
     // Construir subgrafo conectado
     cout << "\nConstruindo subgrafo conectado...\n";
     Graph connectedSubgraph = buildConnectedSubgraph(graph, shortestPaths);
+    cout << "\nSubgrafo conectado construído:\n";
+    connectedSubgraph.print();
 
     // Encontrar a MST
     cout << "\nGerando MST do subgrafo conectado...\n";
     Graph mst = primMST(connectedSubgraph);
 
-    validateGraph(connectedSubgraph);
-
+    validateGraph(mst);
 
     return 0;
 }
