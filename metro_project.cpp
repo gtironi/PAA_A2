@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 #include <chrono> // Incluído para medir o tempo de execução
+#include <iomanip> // Para formatação de tempo
+#include <cmath> // Para funções matemáticas
 
 using namespace std;
 using namespace std::chrono;
@@ -340,8 +342,8 @@ Graph primMST(const Graph& graph) {
         }
     }
 
-    cout << "\nÁrvore Geradora Mínima (MST) gerada:\n";
-    mst.print();
+    //cout << "\nÁrvore Geradora Mínima (MST) gerada:\n";
+    //mst.print();
 
     auto endTime = high_resolution_clock::now(); // Fim da medição do tempo
     auto duration = duration_cast<milliseconds>(endTime - startTime).count();
@@ -377,6 +379,10 @@ int main() {
     graph.addEdge(3, 5, "Zona Sul", 20, 50, false, 1, lotesType);
     graph.addEdge(4, 5, "Zona Sul", 8, 50, false, 1, lotesType);
     graph.addEdge(5, 6, "Zona Sul", 22, 50, false, 1, lotesType);
+    graph.addEdge(0, 6, "Zona Norte", 25, 50, false, 1, lotesType);
+    graph.addEdge(6, 7, "Zona Norte", 35, 50, false, 1, lotesType);
+    graph.addEdge(5, 7, "Zona Norte", 40, 50, false, 1, lotesType);
+    graph.addEdge(7, 0, "Zona Norte", 30, 50, false, 1, lotesType);
 
     // Exibindo o grafo
     graph.print();
@@ -384,6 +390,10 @@ int main() {
     // Encontrando as estações de metrô
     cout << "\nSelecionando estações de metrô...\n";
     vector<int> metroStations = findMetroStations(graph);
+    cout << "\nEstações definidas: ";
+    for (int station : metroStations) {
+        cout << station << " ";
+    }
 
     // Encontrando caminhos mais curtos entre estações
     cout << "\nCalculando caminhos mais curtos entre estações...\n";
@@ -392,8 +402,8 @@ int main() {
     // Construir subgrafo conectado
     cout << "\nConstruindo subgrafo conectado...\n";
     Graph connectedSubgraph = buildConnectedSubgraph(graph, shortestPaths);
-    cout << "\nSubgrafo conectado construído:\n";
-    connectedSubgraph.print();
+    //cout << "\nSubgrafo conectado construído:\n";
+    //connectedSubgraph.print();
 
     // Encontrar a MST
     cout << "\nGerando MST do subgrafo conectado...\n";
