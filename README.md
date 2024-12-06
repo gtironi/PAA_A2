@@ -7,13 +7,20 @@ Este projeto visa resolver problemas de planejamento e roteamento de transporte 
 2. **Rota de Ônibus Hop-On/Hop-Off** - Planejar uma única linha de ônibus que percorra a cidade, maximizando a visita a imóveis comerciais e atrações turísticas.
 3. **Serviço de Roteamento para Mobilidade Urbana** - Calcular a rota mais rápida entre dois endereços, considerando diversos meios de transporte e custos.
 
-## Para rodar:
-Para rodar basta modificar seguinte linha do aquivo main.cpp com os parâmetros desejados:
+## Como Executar para Encontrar a Melhor Rota
 
-`melhorRota(graph, 0, 3, 100000);`
+Siga os passos abaixo para rodar o programa e encontrar a melhor rota:
 
-Depois do graph, os parâmetros são vertice de inicio, vertice destino e o dinheiro do usuário. Execute as seguintes linhas de comando no terminal:
+1. **Escolha os parâmetros no arquivo `main.cpp`**:  
+   Encontre a seguinte linha no código:
 
-`g++ -o main main.cpp taxi.cpp dijkstra.cpp graph.cpp heap.cpp list.cpp prim.cpp`
+   ```cpp
+   melhorRota(graph, 0, 3, 100000);
 
-`./main`
+2. **Execute o arquivo `main.cpp`**:
+   ```bash
+    g++ -o main main.cpp taxi.cpp bus.cpp dijkstra.cpp graph.cpp heap.cpp list.cpp trafficAPI.cpp graph_utils.cpp utills.cpp
+
+    ./main
+
+3. **Sigua a rota que foi mostrada no termial!**
