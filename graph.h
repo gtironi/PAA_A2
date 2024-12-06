@@ -23,7 +23,7 @@ public:
     bool isOneway();
     int numLotes();
     float coefficient_lotes();
-    void getLotesType(int lotesType[4]);
+    void getLotesType(int* lotesType);
     EdgeNode* next();
     void setNext(EdgeNode* next);
 

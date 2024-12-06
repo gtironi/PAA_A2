@@ -17,7 +17,7 @@ EdgeNode::EdgeNode(vertex otherVertex, const string& bairro, int length, int max
     if (numAtracoes + numComercios > 0) {
         m_coefficient_lotes = (numCasas + numIndustria) / float(numAtracoes + numComercios);
     } else {
-        m_coefficient_lotes = INT_MAX;  // Caso não haja atrações ou comércios, o coeficiente é inf
+        m_coefficient_lotes = 100;  // Caso não haja atrações ou comércios, o coeficiente é muito alto
     }
 
     // Calcular o custo para construir o metrô
@@ -57,7 +57,7 @@ float EdgeNode::coefficient_lotes() {
     return m_coefficient_lotes;
 }
 
-void EdgeNode::getLotesType(int lotesType[4]) {
+void EdgeNode::getLotesType(int* lotesType) {
     for (int i = 0; i < 4; ++i) {
         lotesType[i] = m_lotesType[i];
     }
@@ -290,9 +290,10 @@ GraphAdjList* GraphAdjList::createBidirectionalCopy() const {
             int maxSpeed = edge->maxSpeed();
             int numLotes = edge->numLotes();
 
+            edge->getLotesType(lotesType);
+
             // Adiciona as arestas (i, j) e (j, i) no grafo bidirecional
             bidirectionalGraph->addEdge(i, j, bairro, cost, maxSpeed, false, numLotes, lotesType);
-            // bidirectionalGraph->addEdge(j, i, bairro, cost, maxSpeed, false);
 
             edge = edge->next();
         }
