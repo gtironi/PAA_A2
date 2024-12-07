@@ -7,7 +7,7 @@
 #include "taxi.h"
 #include "task1.h"
 
-void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional) {
+void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional, const vector<vertex>& stations) {
     //======================================================================
     // Testando funções de metrô
 
@@ -29,8 +29,6 @@ void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional
 
     // Verificando resultados
     while (currentVertex != nullptr && expectedCurrentVertex != nullptr){
-        cout << currentVertex->data << endl;
-        cout << expectedCurrentVertex->data << endl;
         assert(currentVertex->data == expectedCurrentVertex->data);
         expectedCurrentVertex = expectedCurrentVertex->next;
         currentVertex = currentVertex->next;
@@ -39,41 +37,47 @@ void testMetro(GraphAdjList& graphStreets, GraphAdjList& graphMetroBidirectional
     cout << "Teste do caminho passou!" << endl;
 
     // Vértices esperado no grafo de metrô
-    vertex expectedVertexInGraph1 = 7;
-    vertex expectedVertexInGraph2 = 10;
-    vertex expectedVertexInGraph3 = 3;
-    vertex expectedVertexNotInGraph = 0;
+    vertex expectedStation1 = 1;
+    vertex expectedStation2 = 10;
+    vertex expectedNotStation = 6;
 
     // Verificando resultados;
-    assert(vertexInGraphMetro(expectedVertexInGraph1, graphMetroBidirectional));
-    assert(vertexInGraphMetro(expectedVertexInGraph2, graphMetroBidirectional));
-    assert(vertexInGraphMetro(expectedVertexInGraph3, graphMetroBidirectional));
-    assert(!vertexInGraphMetro(expectedVertexNotInGraph, graphMetroBidirectional));
+    assert(isStation(expectedStation1, stations));
+    assert(isStation(expectedStation2, stations));
+    assert(!isStation(expectedNotStation, stations));
 
-    cout << "Teste do pertencimento passou!" << endl;
+    cout << "Teste de verificação de estação passou!" << endl;
 
     // Testes da função de estação mais próxima.
-    // Primeiro teste: estação inicial
-    // Vértice esperado
-    vertex expectedStation = 1;
+    // Vértices esperados
+    // Vértice antes da primeiro estação
+    vertex expectedClosestStation1 = 1;
+    // Vértice "dentro" do metrô mais próximo da primeira estação
+    vertex expectedClosestStation2 = 1;
+    // vértice mais próximo da segunda estação
+    vertex expectedClosestStation3 = 10;
 
     // Rodando função
-    vertex closestStation = closestMetroStation(2, graphStreets, graphMetroBidirectional);
+    vertex closestStation1 = closestMetroStation(2, graphStreets, stations);
+    vertex closestStation2 = closestMetroStation(3, graphStreets, stations);
+    vertex closestStation3 = closestMetroStation(9, graphStreets, stations);
 
-    // Verificando resultado
-    assert(expectedStation == closestStation);
-
-    // Segundo teste: estação final
-    // Vértice esperado
-    expectedStation = 10;
-
-    // Rodando função
-    closestStation = closestMetroStation(11, graphStreets, graphMetroBidirectional);
-
-    // Verificando resultado
-    assert(expectedStation == closestStation);
+    // Verificando resultados
+    assert(expectedClosestStation1 == closestStation1);
+    assert(expectedClosestStation2 == closestStation2);
+    assert(expectedClosestStation3 == closestStation3);
 
     cout << "Teste da estação mais próxima passou!" << endl;
+
+    // Teste da função de tempo gasto
+    const int METRO_SPEED = 70;
+    
+    float timeTaken = timeMetro(graphMetroBidirectional, *pathMetro, METRO_SPEED);
+    float expectedTimeTaken = 380.0/70.0;
+
+    assert(expectedTimeTaken == timeTaken);
+
+    cout << "Teste do tempo passou!" << endl;
 }
 
 int main() {
@@ -95,12 +99,13 @@ int main() {
     graphStreets.addEdge(1, 3, "Centro", stdSizeEdge, stdMaxSpeed, !oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(3, 4, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(3, 5, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(3, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+    // Colocando algumas arestas um pouco menores para garantir o caminho de metro do teste
+    graphStreets.addEdge(3, 7, "Centro", stdSizeEdge - 10, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(4, 6, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(5, 7, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(6, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(6, 10, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
-    graphStreets.addEdge(7, 8, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
+    graphStreets.addEdge(7, 8, "Centro", stdSizeEdge - 10, stdMaxSpeed, oneWay, stdNumLots, lotsType);
     graphStreets.addEdge(7, 9, "Centro", stdSizeEdge, stdMaxSpeed, oneWay, stdNumLots, lotsType);
 
     // Segunda região: vértices de 8 a 12
@@ -139,13 +144,13 @@ int main() {
     cout << endl;
 
     cout << "Rodando função para criar subgrafo de estações" << endl;
-    GraphAdjList graphMetroBidirectional = *createTreeMetro(*graphStreetsBidirectional, stations, 70);
+    GraphAdjList graphMetroBidirectional = *createTreeMetro(*graphStreetsBidirectional, stations);
 
     cout << "Printando grafo de metro:" << endl;
     graphMetroBidirectional.print();
 
     cout << "Rodando testes do metro" << endl;
-    testMetro(graphStreets, graphMetroBidirectional);
+    testMetro(graphStreets, graphMetroBidirectional, stations);
     
     return 0;
 }

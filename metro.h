@@ -11,7 +11,7 @@
 
 using namespace std;
 
-GraphAdjList* createTreeMetro(GraphAdjList& graphStreets, const vector<vertex>& stations, int metroSpeed);
+GraphAdjList* createTreeMetro(GraphAdjList& graphStreets, const vector<vertex>& stations);
 
 vector<vector<vertex>> getRegionsAsMatrix(const GraphAdjList& graph);
 
@@ -21,9 +21,9 @@ IntList* createPathMetro(GraphAdjList& graphMetro, int start, int end);
 
 float timeMetro(GraphAdjList& graphMetro, IntList& path, const int SPEED_METRO);
 
-bool vertexInGraphMetro(vertex v, GraphAdjList& graphMetro);
+bool isStation(vertex v, const vector<vertex>& stations);
 
-vertex closestMetroStation(vertex start, GraphAdjList& graphStreets, GraphAdjList& graphMetro);
+vertex closestMetroStation(vertex v, GraphAdjList& graphStreets, const vector<vertex>& stations);
 
 
 #endif // METRO_H
